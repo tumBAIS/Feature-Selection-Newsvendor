@@ -28,7 +28,7 @@ Then, activate the environment and run `python generate_instances.py` to create 
 
 All parameters are passed by CLI arguments to the executable file `newsvendor-features` using:
 
-`./newsvendor-features problem_type instance_path backorder_cost holding_cost [-split train_val_split] [-split_size subset_samples] [-lambda regularization_param] [-folds k] [-breakpts n_bpts] [-t time_limit] [-threads nb_threads] [-o out_path]`
+`./newsvendor-features problem_type instance_path backorder_cost holding_cost [--split train_val_split] [--split_size subset_samples] [--lambda regularization_param] [--folds k] [--breakpts n_bpts] [-t time_limit] [--threads nb_threads] [-o out_path]`
 
 The following CLI arguments are available:
 
@@ -40,13 +40,13 @@ The following CLI arguments are available:
 | instance_path | Path to instance file |
 | backorder_cost | Back-ordering cost $b$ |
 | holding_cost | Holding cost $h$ |
-| -split | Number of training-validation splits |
-| -split_size | Size of training-validation split | 
-| -lambda | Regularization parameter $\lambda$ |
-| -folds | Number of partitions for cross-validation |
-| -breakpts | Number of breakpoints for grid search cross-validation |
+| --split | Number of training-validation splits |
+| --split_size | Size of training-validation split | 
+| --lambda | Regularization parameter $\lambda$ |
+| --folds | Number of partitions for cross-validation |
+| --breakpts | Number of breakpoints for grid search cross-validation |
 | -t | Time limit (in seconds) | 
-| -threads | Number of threads to be used by CPLEX | 
+| --threads | Number of threads to be used by CPLEX | 
 | -o | Path to save output file |
 
 

@@ -46,21 +46,19 @@ commandline::commandline(int argc, char *argv[])
 	this->timeLimit = -1; // use CPLEX default
 	this->train_val_split = 0.7;
 	this->split_size = -1; // use all data points in the splits
-	this->split_feat = 1; // use all features in the splits
 	this->regularization_param = 0;
 	this->nb_folds = -1;
 	this->nb_breakpoints = -1;
 	this->output_path = "output/";
-	this->set_value_z = false;
 
 	int numRequiredParams = 5;
-	int numDefaultParams = 20;
+	int numDefaultParams = 16;
 
 	// Read in options
     if ((argc % 2 != (numRequiredParams % 2)) || (argc > numRequiredParams+numDefaultParams) || (argc < numRequiredParams))
 	{
 		cout << "ERROR: invalid command line" << endl;
-		cout << "USAGE: ./executable problem_type instance_path backorder_cost holding_cost [-split train_val_split] [-split_size subset_samples] [-split_feat subset_features] [-lambda regularization_param] [-folds k] [-breakpts n_bpts] [-t time_limit] [-threads nb_threads] [-o out_path] [-setz set_val_z]" << endl;
+		cout << "USAGE: ./executable problem_type instance_path backorder_cost holding_cost [--split train_val_split] [--split_size subset_samples] [--lambda regularization_param] [--folds k] [--breakpts n_bpts] [-t time_limit] [--threads nb_threads] [-o out_path]" << endl;
 		
 		printf("I received the following %d arguments: \n", argc);
 		for (int i=0; i<argc; i++)
@@ -117,7 +115,7 @@ commandline::commandline(int argc, char *argv[])
 		
 		for (int i=numRequiredParams; i<argc; i+=2)
 		{
-			if (string(argv[i]) == "-split") // Train-Validation Split
+			if (string(argv[i]) == "--split") // Train-Validation Split
 			{
 				this->train_val_split = atof(argv[i+1]);
 				if (this->train_val_split < 0 || this->train_val_split > 1)
@@ -127,7 +125,7 @@ commandline::commandline(int argc, char *argv[])
 				}
 			}
 
-			else if (string(argv[i]) == "-split_size")
+			else if (string(argv[i]) == "--split_size")
 			{
 				this->split_size = atoi(argv[i+1]);
 				if (this->split_size <= 0)
@@ -137,20 +135,10 @@ commandline::commandline(int argc, char *argv[])
 				}
 			}
 
-			else if (string(argv[i]) == "-split_feat")
-			{
-				this->split_feat = atof(argv[i+1]);
-				if (this->split_feat < 0 || this->split_feat > 1)
-				{
-					cout << "ERROR: subset_features must be a real number between 0 and 1" << endl;
-					return;
-				}
-			}
-
-			else if (string(argv[i]) == "-lambda")
+			else if (string(argv[i]) == "--lambda")
 				this->regularization_param = atof(argv[i+1]);
 
-			else if (string(argv[i]) == "-folds")
+			else if (string(argv[i]) == "--folds")
 			{
 				this->nb_folds = atoi(argv[i+1]);
 				if (this->nb_folds <= 0)
@@ -160,31 +148,17 @@ commandline::commandline(int argc, char *argv[])
 				}
 			}
 
-			else if (string(argv[i]) == "-breakpts")
+			else if (string(argv[i]) == "--breakpts")
 				this->nb_breakpoints = atoi(argv[i+1]);
 
 			else if (string(argv[i]) == "-t")
 				this->timeLimit = atof(argv[i+1]);
 
-			else if (string(argv[i]) == "-threads")
+			else if (string(argv[i]) == "--threads")
 				this->nbThreads = atoi(argv[i+1]);
 
 			else if (string(argv[i]) == "-o")
 				this->output_path = argv[i+1];
-
-			else if (string(argv[i]) == "-setz")
-			{
-				if (strcmp(argv[i+1], "y") == 0)
-					this->set_value_z = true;
-				else if (strcmp(argv[i+1], "n") == 0)
-					this->set_value_z = false;
-				else
-				{
-					cout << "ERROR: invalid option for parameter -setz" << endl;
-					return;
-				}
-			}
-
 		}
 	}
 
@@ -240,15 +214,6 @@ commandline::commandline(int argc, char *argv[])
 	if (exists == true && this->split_size > 0)
 	{
 		cout << "ERROR: the chosen method does not support the split size parameter." << endl;
-		return;
-	}
-
-	// Split features - not permitted
-	ProblemType disallow_split_feat[6] = {ERM, ERM_l0, ERM_l1, BL, GS_ERM_l0, GS_ERM_l1};
-	exists = std::find(std::begin(disallow_split_feat), std::end(disallow_split_feat), this->problemType) != std::end(disallow_split_feat);
-	if (exists == true && this->split_feat != 1)
-	{
-		cout << "ERROR: the chosen method does not support the split features parameter." << endl;
 		return;
 	}
 
@@ -332,11 +297,6 @@ int commandline::get_split_size()
 	return split_size;
 }
 
-double commandline::get_split_feat()
-{
-	return split_feat;
-}
-
 double commandline::get_regularization_param()
 {
 	return regularization_param;
@@ -352,7 +312,3 @@ int commandline::get_nb_breakpoints()
 	return nb_breakpoints;
 }
 
-bool commandline::get_set_value_z()
-{
-	return set_value_z;
-}

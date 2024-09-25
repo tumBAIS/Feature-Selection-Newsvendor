@@ -41,9 +41,6 @@ private:
 	// size of the subset used for each split in the BL Shuffle & Split
 	int split_size;
 
-	// proportion of features to be used in each split in the BL Shuffle & Split
-	double split_feat;
-
 	// regularization parameter for ERM models (lambda)
 	double regularization_param;
 
@@ -52,9 +49,6 @@ private:
 
 	// number of breakpoints for grid search
 	int nb_breakpoints;
-
-	// set value for variable z
-	bool set_value_z;
 
 	// number of threads for CPLEX
 	int nbThreads;
@@ -102,9 +96,6 @@ public:
 	// gets the size of the subset to be used for splitting the data into training/validation sets
 	int get_split_size();
 
-	// gets the proportion of features to be used in each split
-	double get_split_feat();
-
 	// gets regularization parameter
 	double get_regularization_param();
 
@@ -119,10 +110,7 @@ public:
 
 	// get CPLEX time limit
 	double get_timeLimit();
-
-	// set value for variable z ?
-	bool get_set_value_z();
-
+	
 	// is the commandline valid ?
 	bool is_valid();
 };

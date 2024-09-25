@@ -29,10 +29,9 @@ int main(int argc, char *argv[])
                              c.get_backorder_cost(), c.get_holding_cost(), 
                              c.get_problem_type(), c.get_str_problem_type(), 
                              c.get_train_val_split(), c.get_split_size(), 
-                             c.get_split_feat(), c.get_regularization_param(), 
+                             c.get_regularization_param(), 
                              c.get_nb_folds(), c.get_nb_breakpoints(),
-                             c.get_nbThreads(), c.get_timeLimit(), 
-                             c.get_set_value_z());
+                             c.get_nbThreads(), c.get_timeLimit());
             
             // Begin of clock
             myData->time_StartOpt = clock();

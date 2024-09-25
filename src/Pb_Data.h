@@ -76,9 +76,6 @@ public:
     // whether to save full solution (including solution vector for u, o, mu, gamma, etc) or not
     bool save_full_soln = false;
 
-    // set values for variable z
-    bool set_value_z;
-
     // back-ordering cost
     double backOrderCost;
 
@@ -144,10 +141,7 @@ public:
 
     // Size of validation set for each split
     int splitValSize;
-
-    // Proportion of features to be used in each split
-    double splitFeatures;
-
+    
     // Number of features to be used in each split
     int splitNbFeatures;
 
@@ -213,8 +207,8 @@ public:
     Pb_Data(string pathToInstance, string instanceFilename, string outputPath, 
             double backOrderCost, double holdingCost, ProblemType problemType, 
             string strProblemType, double trainValSplit, int splitSize, 
-            double splitFeatures, double regularizationParam, int nbFolds, 
-            int nbBreakpoints, int nbThreads, double timeLimit, bool set_value_z);
+            double regularizationParam, int nbFolds, int nbBreakpoints, 
+            int nbThreads, double timeLimit);
 };
 
 #endif

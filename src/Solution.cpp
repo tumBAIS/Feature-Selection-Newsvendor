@@ -480,7 +480,6 @@ void SolutionBilevelShuffleSplit::exportSolutionArrays(std::ofstream &myFile)
     myFile << "split_size" << myData->sep << myData->splitSize << endl;
     myFile << "split_train_size" << myData->sep << myData->splitTrainSize << endl;
     myFile << "split_val_size" << myData->sep << myData->splitValSize << endl;
-    myFile << "split_features" << myData->sep << myData->splitFeatures << endl;
     myFile << "split_nb_features" << myData->sep << myData->splitNbFeatures << endl;
 
     exportMatrix(myData->activeFeatures, myFile, "active_features", myData->sep);   // Export active features

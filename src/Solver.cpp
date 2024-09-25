@@ -522,14 +522,6 @@ int SolverBilevel::solve()
         xctypeZ[j] = 'B';
         namesZ[j] = new char[100];
 		sprintf(namesZ[j], "z_%d", j);
-
-        if ((myData->set_value_z) && (j > 0))
-        {
-            if (j <= myData->nbInformativeFeatures)
-                lbZ[j] = 1.0;
-            else
-                ubZ[j] = 0.0;
-        }
 	}
     status = solverAddCols(env, model, sizeZ, NULL, lbZ, ubZ, xctypeZ, namesZ);
     for (int j = 0; j < sizeZ; j++)

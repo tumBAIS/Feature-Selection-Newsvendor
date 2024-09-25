@@ -2,14 +2,14 @@
 
 Pb_Data::Pb_Data(string instance_path, string instance_filename, string output_path,
                  double backOrderCost, double holdingCost, ProblemType problemType, string strProblemType, 
-                 double trainValSplit, int nominalSplitSize, double splitFeatures, double regularizationParam,
-                 int nbFolds, int nbBreakpoints, int nbThreads, double timeLimit, bool set_value_z) : 
+                 double trainValSplit, int nominalSplitSize, double regularizationParam,
+                 int nbFolds, int nbBreakpoints, int nbThreads, double timeLimit) : 
                  instance_path(instance_path), instance_filename(instance_filename), output_path(output_path),
                  backOrderCost(backOrderCost), holdingCost(holdingCost), 
                  problemType(problemType), strProblemType(strProblemType),
-                 trainValSplit(trainValSplit), nominalSplitSize(nominalSplitSize), splitFeatures(splitFeatures), 
-                 regularizationParam(regularizationParam), nbFolds(nbFolds), nbBreakpoints(nbBreakpoints),
-                 nbThreads(nbThreads), timeLimit(timeLimit), set_value_z(set_value_z)
+                 trainValSplit(trainValSplit), nominalSplitSize(nominalSplitSize), 
+                 regularizationParam(regularizationParam), nbFolds(nbFolds), 
+                 nbBreakpoints(nbBreakpoints), nbThreads(nbThreads), timeLimit(timeLimit)
 {
     // Get instance name
     int pos = instance_filename.find(this->train_data_extension);
@@ -115,15 +115,11 @@ Pb_Data::Pb_Data(string instance_path, string instance_filename, string output_p
         // Split Validation set size
         this->splitValSize = this->splitSize - this->splitTrainSize;
 
-        // Number of features in each split
-        this->splitNbFeatures = 1 + (int) ceil(this->splitFeatures * (double) (this->nbFeatures-1));
-
         std::cout << "Number of folds: " << this->nbFolds << endl;
         std::cout << "Nominal split size: " << this->nominalSplitSize << endl;
         std::cout << "Split size: " << this->splitSize << endl;
         std::cout << "Split training size: " << this->splitTrainSize << endl;
         std::cout << "Split validation size: " << this->splitValSize << endl;
-        std::cout << "Proportion of features in each split: " << 100*this->splitFeatures << " %" << endl;
         std::cout << "Number of features in each split: " << this->splitNbFeatures << endl;
 
         // Create a vector that stores the sample ids
