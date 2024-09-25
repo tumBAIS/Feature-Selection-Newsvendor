@@ -33,7 +33,7 @@ std::unique_ptr<Solver> Solver::createSolver(std::shared_ptr<Pb_Data> myData, st
 
     else
     {   
-        fprintf(stderr, "Failed to create solver structure: no solver matching the input could be found \n");
+        std::cerr << "Failed to create solver structure: no solver matching the input could be found" << std::endl;
         return NULL;
     }
 }
@@ -50,7 +50,7 @@ std::unique_ptr<SolverSubProblem> SolverSubProblem::createSolverSP(std::shared_p
 
     else 
     {
-        fprintf(stderr, "Failed to create solver structure for subproblem: no solver matching the input could be found \n");
+        std::cerr << "Failed to create solver structure for subproblem: no solver matching the input could be found" << std::endl;
         return NULL;
     }
 }
@@ -134,8 +134,9 @@ int Solver::quit_solver(void *env, void *model)
         int xstatus = CPXfreeprob((CPXENVptr) env, &lp);
         if (!status) status = xstatus;
         if (status) {
-            fprintf(stderr, "Failed to free memory for problem: %s\n", 
-                    CPXgeterrorstring((CPXENVptr) env, status, errbuf));
+            std::cerr << "Failed to free memory for problem: " 
+                << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
+                << std::endl;
         }
     }
 
@@ -144,8 +145,9 @@ int Solver::quit_solver(void *env, void *model)
         int xstatus = CPXcloseCPLEX((CPXENVptr *) &env);
         if (!status) status = xstatus;
         if (status) {
-            fprintf(stderr, "Failed to close CPLEX: %s\n", 
-                    CPXgeterrorstring((CPXENVptr) env, status, errbuf));
+            std::cerr << "Failed to close CPLEX: " 
+                << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
+                << std::endl;
         }
     }
     return status;
@@ -173,7 +175,11 @@ int Solver::solverAddCols(void *env, void *model, int ccnt, double *obj, double 
 
     char errbuf[CPXMESSAGEBUFSIZE];
     status = CPXnewcols((CPXENVptr) env, (CPXLPptr) model, ccnt, obj, lb, ub, vtype, colname);
-    if (status) fprintf(stderr, "Failed to add variables: %s\n", CPXgeterrorstring((CPXENVptr) env, status, errbuf));
+    if (status) {
+        std::cerr << "Failed to add variables: " 
+            << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
+            << std::endl;
+    }
     return status;
 }
 
@@ -221,7 +227,11 @@ int Solver::solverOptimize(void *env, void *model, ModelType model_type)
     } else if (model_type == MIP_PROBLEM) {
         status = CPXmipopt((CPXENVptr) env, (CPXLPptr) model);
     }
-    if (status) fprintf(stderr, "Failed to optimize: %s\n", CPXgeterrorstring((CPXENVptr) env, status, errbuf));
+    if (status) {
+        std::cerr << "Failed to optimize: " 
+            << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
+            << std::endl;
+    }
     return status;
 }
 
@@ -231,7 +241,11 @@ int Solver::solverRetrieveSolution(void *env, void *model, int *modelstatus, dou
 
     char errbuf[CPXMESSAGEBUFSIZE];
     status = CPXsolution((CPXENVptr) env, (CPXLPptr) model, modelstatus, objval, solution, NULL, NULL, NULL); // Get solution array
-    if (status) fprintf(stderr, "Failed to retrieve solution: %s\n", CPXgeterrorstring((CPXENVptr) env, status, errbuf));
+    if (status) {
+        std::cerr << "Failed to retrieve solution: " 
+            << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
+            << std::endl;
+    }
 
     if (nodecount){
         *nodecount = CPXgetnodecnt((CPXENVptr) env, (CPXLPptr) model); // Get node count
@@ -239,12 +253,20 @@ int Solver::solverRetrieveSolution(void *env, void *model, int *modelstatus, dou
 
     if (mipgap) {
         status = CPXgetmiprelgap((CPXENVptr) env, (CPXLPptr) model, mipgap); // Get MIP gap
-        if (status) fprintf(stderr, "Failed to retrieve MIP gap: %s\n", CPXgeterrorstring((CPXENVptr) env, status, errbuf));
+        if (status) {
+            std::cerr << "Failed to retrieve MIP gap: " 
+                << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
+                << std::endl;
+        }
     }
 
     if (bestobjval) {
         status = CPXgetbestobjval((CPXENVptr) env, (CPXLPptr) model, bestobjval); // Get best objective value
-        if (status) fprintf(stderr, "Failed to retrieve best obj val: %s\n", CPXgeterrorstring((CPXENVptr) env, status, errbuf));
+        if (status) {
+            std::cerr << "Failed to retrieve best obj val: " 
+                << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
+                << std::endl;
+        }
     }
     return status;
 }
@@ -476,11 +498,11 @@ int SolverBilevel::solve()
     bool debug = true;
     int status = 0;
 
-    std::cout << "Solving optimization problem" << endl;
+    std::cout << "Solving optimization problem" << std::endl;
 
     status = initializeModel(1, "Newsvendor-Features");
     if (status) {
-        fprintf(stderr, "Failed to initialize model\n");
+        std::cerr << "Failed to initialize model"<< std::endl;
         return status;
     }
 
@@ -588,7 +610,7 @@ int SolverBilevel::solve()
 
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
-        fprintf(stderr, "ERROR: There is something wrong with the rows or columns of the model. \n");
+        std::cerr << "ERROR: There is something wrong with the rows or columns of the model." << std::endl;
         quit_solver(env, model);
         return 1;
     }
@@ -1126,7 +1148,7 @@ int SolverBilevelShuffleSplit::solve()
 
     status = initializeModel(1, "Newsvendor-Features");
     if (status) {
-        fprintf(stderr, "Failed to initialize model\n");
+        std::cerr << "Failed to initialize model" << std::endl;
         return status;
     }
 
@@ -1212,7 +1234,7 @@ int SolverBilevelShuffleSplit::solve()
 
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
-        fprintf(stderr, "ERROR: There is something wrong with the model dimensions. \n");
+        std::cerr << "ERROR: There is something wrong with the model dimensions." << std::endl;
         quit_solver(env, model);
         return 1;
     }

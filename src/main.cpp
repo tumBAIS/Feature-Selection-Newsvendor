@@ -39,9 +39,13 @@ int main(int argc, char *argv[])
 
             // Create the solution data structure
             auto mySolution = Solution::createSolution(myData);
+            if (mySolution==NULL)
+                return 1;
 
             // Create the solver data structures
             auto mySolver = Solver::createSolver(myData, mySolution);
+            if (mySolver==NULL)
+                return 1;
 
             // Solve the problem
             if (mySolver->solve())

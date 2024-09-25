@@ -77,7 +77,7 @@ std::shared_ptr<Solution> Solution::createSolution(std::shared_ptr<Pb_Data> myDa
     
     else
     {   
-        fprintf(stderr, "Failed to create solution structure: no solution matching the input could be found \n");
+        std::cerr << "Failed to create solution structure: no solution matching the input could be found" << std::endl;
         return NULL;
     }
 }
@@ -95,7 +95,7 @@ std::shared_ptr<SolutionSubProblem> SolutionSubProblem::createSolutionSP(std::sh
 
     else
     {
-        fprintf(stderr, "Failed to create solution structure for subproblem: no solution matching the input could be found \n");
+        std::cerr << "Failed to create solution structure for subproblem: no solution matching the input could be found" << std::endl;
         return NULL;
     }
 }
@@ -453,7 +453,7 @@ void Solution::exportSolution(string ext)
         // Close the file
         myFile.close();
     } else {
-        fprintf(stderr, "ERROR: Unable to open file \n");
+        std::cerr << "ERROR: Unable to open file" << std::endl;
     }
 }
 

@@ -176,7 +176,7 @@ int SolverERM::solve()
     // Initialize model
     error = initializeModel(1, "Newsvendor-ERM");
     if (error) {
-        fprintf(stderr, "Failed to initialize model\n");
+        std::cerr << "Failed to initialize model" << std::endl;
         return error;
     }
 
@@ -229,7 +229,7 @@ int SolverERM::solve()
 
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
-        fprintf(stderr, "ERROR: There is something wrong with the model. \n");
+        std::cerr << "ERROR: There is something wrong with the model." << std::endl;
         quit_solver(env, model);
         return 1;
     }
@@ -283,7 +283,7 @@ int SolverERM_l0::solve()
     // Initialize model
     error = initializeModel(1, "Newsvendor-ERM");
     if (error) {
-        fprintf(stderr, "Failed to initialize model\n");
+        std::cerr << "Failed to initialize model" << std::endl;
         return error;
     }
 
@@ -356,7 +356,7 @@ int SolverERM_l0::solve()
 
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
-        fprintf(stderr, "ERROR: There is something wrong with the model. \n");
+        std::cerr << "ERROR: There is something wrong with the model." << std::endl;
         quit_solver(env, model);
         return 1;
     }
@@ -415,7 +415,7 @@ int SolverERM_l1::solve()
     // Initialize model
     error = initializeModel(1, "Newsvendor-ERM");
     if (error) {
-        fprintf(stderr, "Failed to initialize model\n");
+        std::cerr << "Failed to initialize model" << std::endl;
         return error;
     }
 
@@ -570,7 +570,7 @@ int SolverERM_l1::solve()
     
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
-        fprintf(stderr, "ERROR: There is something wrong with the model. \n");
+        std::cerr << "ERROR: There is something wrong with the model." << std::endl;
         quit_solver(env, model);
         return 1;
     }

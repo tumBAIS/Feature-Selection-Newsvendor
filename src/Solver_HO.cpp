@@ -157,7 +157,7 @@ int SolverSubProblem_ERM_l0::solve()
 
     error = initializeModel(0, "Subproblem-ERM_l0");
     if (error) {
-        fprintf(stderr, "Failed to initialize model\n");
+        std::cerr << "Failed to initialize model" << std::endl;
         return error;
     }
 
@@ -264,7 +264,7 @@ int SolverSubProblem_ERM_l0::solve()
     
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
-        fprintf(stderr, "ERROR: There is something wrong with the model dimensions. \n");
+        std::cerr << "ERROR: There is something wrong with the model." << std::endl;
         quit_solver(env, model);
         return 1;
     }
@@ -406,7 +406,7 @@ int SolverSubProblem_ERM_l1::solve()
 
     error = initializeModel(0, "Subproblem-ERM_l1");
     if (error) {
-        fprintf(stderr, "Failed to initialize model\n");
+        std::cerr << "Failed to initialize model" << std::endl;
         return error;
     }
 
@@ -506,7 +506,7 @@ int SolverSubProblem_ERM_l1::solve()
     
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
-        fprintf(stderr, "ERROR: There is something wrong with the model dimensions. \n");
+        std::cerr << "ERROR: There is something wrong with the model." << std::endl;
         quit_solver(env, model);
         return 1;
     }
@@ -599,7 +599,7 @@ int SolverGridSearch::solve()
 
         status = spSolvers[l]->solve(); // Solve subproblem l
         if (status) {
-            fprintf(stderr, "Failed to solve subproblem %d \n", l);
+            std::cerr << "Failed to solve subproblem " << l << std::endl;
         }
 
         // Update optimal validation cost and the corresponding number of features
@@ -617,7 +617,7 @@ int SolverGridSearch::solve()
     std::cout << endl << "###  Solving final model with lambda = " << myData->regularizationParam << "  ###" << endl << endl;
     status = finalSolver->solve();
     if (status) {
-        fprintf(stderr, "Failed to solve final model \n");
+        std::cerr << "Failed to solve final model" << std::endl;
     }
 
     // Check optimality of final model run
@@ -770,7 +770,7 @@ int SolverGridSearchCV::solve()
 
             status = spSolvers[k][l]->solve(); // Solve subproblem l
             if (status) {
-                fprintf(stderr, "Failed to solve subproblem %d, fold %d\n", l, k);
+                std::cerr << "Failed to solve subproblem " << l << ", fold " << k << std::endl;
             }
 
             isOptimal = (isOptimal && isSolOpt(spSolutions[k][l]->solverStatus)); // Check if it is optimal
@@ -846,7 +846,7 @@ int SolverGridSearchCV::solve()
     myData->resetSplit(); // Update hold-out split
     status = finalSolver->solve();
     if (status) {
-        fprintf(stderr, "Failed to solve final model \n");
+        std::cerr << "Failed to solve final model" << std::endl;
     }
 
     // Check optimality of final model run
