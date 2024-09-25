@@ -28,7 +28,7 @@ Then, activate the environment and run `python generate_instances.py` to create 
 
 All parameters are passed by CLI arguments to the executable file `newsvendor-features` using:
 
-`./executable problem_type instance_path backorder_cost holding_cost [-split train_val_split] [-split_size subset_samples] [-lambda regularization_param] [-folds k] [-breakpts n_bpts] [-t time_limit] [-threads nb_threads] [-o out_path]`
+`./newsvendor-features problem_type instance_path backorder_cost holding_cost [-split train_val_split] [-split_size subset_samples] [-lambda regularization_param] [-folds k] [-breakpts n_bpts] [-t time_limit] [-threads nb_threads] [-o out_path]`
 
 The following CLI arguments are available:
 
@@ -64,3 +64,8 @@ The following CLI arguments are available:
 | GS_SS_ERM_l0 | GS_ERM_l0 with Shuffle & Split cross-validation |
 | GS_SS_ERM_l1 | GS_ERM_l1 with Shuffle & Split cross-validation |
 
+### Example program call
+
+As an example, the following command reads the specified file from the `data` directory and solves the corresponding instance using the Bilevel Feature Selection (BFS) method:
+
+`./newsvendor-features BL ../data/n300-m8-linear-l1-s6.train 1 1`
