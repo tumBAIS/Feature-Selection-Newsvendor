@@ -505,18 +505,18 @@ void SolutionBilevelShuffleSplit::exportSolutionArrays(std::ofstream &myFile)
 void Solution::displaySolution()
 {
     // Print results
-    printf("\n");
-    printf("Problem type:                        %s \n", myData->strProblemType.c_str());
-    printf("Solution status:                     %d (%s) \n", solverStatus, strStatus.c_str());
-    printf("Solution time:                       %0.10f \n", solution_time);
-    printf("Objective value:                     %0.10f \n", objVal);
-    printf("Objective lower bound:               %0.10f \n", lowerBoundVal);
-    printf("Relative objective gap (MIP):        %0.10f \n", mipGap);
-    printf("Nodes processed:                     %d \n", nodeCount);
     std::cout << endl;
-    printf("Cost on training set:                 %0.10f \n", trainCost);
-    printf("Cost on validation set:               %0.10f \n", valCost);
-    printf("Cost on training + validation set:    %0.10f \n", trainValCost);
-    printf("Cost on test set:                     %0.10f \n", testCost);
+    std::cout << "Problem type:                        " << myData->strProblemType << std::endl;
+    std::cout << "Solution status:                     " << solverStatus << " (" << strStatus << ")" << std::endl;
+    std::cout << "Solution time:                       " << std::setprecision(10) << solution_time << std::endl;
+    std::cout << "Objective value:                     " << std::setprecision(10) << objVal << std::endl;
+    std::cout << "Objective lower bound:               " << std::setprecision(10) << lowerBoundVal << std::endl;
+    std::cout << "Relative objective gap (MIP):        " << std::setprecision(10) << mipGap << std::endl;
+    std::cout << "Nodes processed:                     " << nodeCount << std::endl;
+    std::cout << endl;
+    std::cout << "Cost on training set:                 " << std::setprecision(10) << trainCost << std::endl;
+    std::cout << "Cost on validation set:               " << std::setprecision(10) << valCost << std::endl;
+    std::cout << "Cost on training + validation set:    " << std::setprecision(10) << trainValCost << std::endl;
+    std::cout << "Cost on test set:                     " << std::setprecision(10) << testCost << std::endl;
     std::cout << endl;   
 }

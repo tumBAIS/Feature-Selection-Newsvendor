@@ -582,10 +582,10 @@ int SolverBilevel::solve()
     status = solverGetModelDimensions(env, model, numcols, numlinconstrs, numindconstrs, numrows);
     if (status) return status;
 
-    printf("Number of columns: %d\n", numcols);
-    printf("Number of rows: %d\n", numrows);
-    printf("Number of linear constraints: %d\n", numlinconstrs);
-    printf("Number of indicator constraints: %d\n", numindconstrs);
+    std::cout << "Number of columns: " << numcols << std::endl;
+    std::cout << "Number of rows: " << numrows << std::endl;
+    std::cout << "Number of linear constraints: " << numlinconstrs << std::endl;
+    std::cout << "Number of indicator constraints: " << numindconstrs << std::endl;
 
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
@@ -612,7 +612,7 @@ int SolverBilevel::solve()
         numSelFeats += solution[sizeU+sizeO+sizeBeta+sizeMu+sizeGamma+j];
         std::cout << std::setw(10) << solution[sizeU+sizeO+j] << std::setw(5) << solution[sizeU+sizeO+sizeBeta+sizeMu+sizeGamma+j] << endl;
     }
-    printf("Number of selected features: %d\n", numSelFeats);
+    std::cout << "Number of selected features: " << numSelFeats << std::endl;
 
     // Create new solution structure
     this->mySolution->update(numcols, numrows, lpstat, stat_str, objval, bestobjval, nodecount, mipgap, solution);
@@ -1206,10 +1206,10 @@ int SolverBilevelShuffleSplit::solve()
     status = solverGetModelDimensions(env, model, numcols, numlinconstrs, numindconstrs, numrows);
     if (status) return status;
 
-    printf("Number of columns: %d\n", numcols);
-    printf("Number of rows: %d\n", numrows);
-    printf("Number of linear constraints: %d\n", numlinconstrs);
-    printf("Number of indicator constraints: %d\n", numindconstrs);
+    std::cout << "Number of columns: " << numcols << std::endl;
+    std::cout << "Number of rows: " << numrows << std::endl;
+    std::cout << "Number of linear constraints: " << numlinconstrs << std::endl;
+    std::cout << "Number of indicator constraints: " << numindconstrs << std::endl;
 
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
@@ -1249,7 +1249,7 @@ int SolverBilevelShuffleSplit::solve()
 
         numSelFeats += solution[sizeU+sizeO+sizeBeta+sizeMu+sizeGamma+j];
     }
-    printf("Number of selected features: %d\n", numSelFeats);
+    std::cout << "Number of selected features: " << numSelFeats << std::endl;
 
     // Create new solution structure
     this->mySolution->update(numcols, numrows, lpstat, stat_str, objval, bestobjval, nodecount, mipgap, solution);

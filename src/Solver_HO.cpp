@@ -281,12 +281,12 @@ int SolverSubProblem_ERM_l0::solve()
 
     // Print results
     if (debug) {
-        printf("\n");
-        printf("Solution status:                   %d (%s) \n", lpstat, stat_str.c_str());
-        printf("Objective value:                   %0.10f \n", objval);
-        printf("Objective lower bound:             %0.10f \n", bestobjval);
-        printf("MIP Relative objective gap:        %0.10f \n", mipgap);
-        printf("Nodes processed:                   %d \n", nodecount);
+        std::cout << std::endl;
+        std::cout << "Solution status:                   " << lpstat << " (" << stat_str << ")" << std::endl;
+        std::cout << "Objective value:                   " << std::setprecision(10) << objval << std::endl;
+        std::cout << "Objective lower bound:             " << std::setprecision(10) << bestobjval << std::endl;
+        std::cout << "MIP Relative objective gap:        " << std::setprecision(10) << mipgap << std::endl;
+        std::cout << "Nodes processed:                   " <<  static_cast<int>(nodecount) << std::endl;
     }
 
     // Create new solution structure
@@ -527,10 +527,10 @@ int SolverSubProblem_ERM_l1::solve()
 
     // Print results
     if (debug) {
-        printf("\n");
-        printf("Solution status:                   %d (%s) \n", lpstat, stat_str.c_str());
-        printf("Objective value:                   %0.10f \n", objval);
-        printf("Nodes processed:                   %d \n", nodecount);
+        std::cout << std::endl;
+        std::cout << "Solution status:                   " << lpstat << " (" << stat_str << ")" << std::endl;
+        std::cout << "Objective value:                   " << std::setprecision(10) << objval << std::endl;
+        std::cout << "Nodes processed:                   " << static_cast<int>(nodecount) << std::endl;
     }
 
     // Create new solution structure
@@ -644,7 +644,7 @@ int SolverGridSearch::solve()
     std::cout << "Beta vectors:" << endl;
     int width = 12;
     for (int l=0; l<myData->nbBreakpoints; l++) {
-        printf("        l=%2d", l);
+        std::cout << "        l = " << std::setw(2) << l;
     }
     std::cout << endl;
     for (int j=0; j<myData->nbFeatures; j++)
@@ -661,9 +661,9 @@ int SolverGridSearch::solve()
 
     // Print optimal solution
     std::cout << endl << "Optimal solution:" << endl;
-    printf("Regularization parameter:   %0.5f\n", myData->regularizationParam);
-    printf("Training cost:              %0.5f\n", finalSolution->trainCost);
-    printf("Validation cost:            %0.5f\n", finalSolution->valCost);
+    std::cout << "Regularization parameter:   " << std::fixed << std::setprecision(5) << myData->regularizationParam << std::endl;
+    std::cout << "Training cost:              " << std::fixed << std::setprecision(5) << finalSolution->trainCost << std::endl;
+    std::cout << "Validation cost:            " << std::fixed << std::setprecision(5) << finalSolution->valCost << std::endl;
     std::cout << endl;
 
     myData->timeLimit = origTimeLimit;
@@ -799,13 +799,13 @@ int SolverGridSearchCV::solve()
     {
         // Training cost
         std::cout << "   Train Cost:" << endl;
-        printf("            ");
+        std::cout << "            ";
         for (int l=0; l<myData->nbBreakpoints; l++) 
-            printf("         l = %2d", l);
+            std::cout << "         l = " << std::setw(2) << std::setfill(' ') << l;
         std::cout << endl;
 
         for (int k=0; k<myData->nbFolds; k++) {
-            printf("   k = %2d   ", k);
+            std::cout << "   k = " << std::setw(2) << k << "   ";
             for (int l=0; l<myData->nbBreakpoints; l++) {
                 std::cout << std::setw(15) << spSolutions[k][l]->trainCost;
             }
@@ -814,19 +814,19 @@ int SolverGridSearchCV::solve()
 
         // Validation cost
         std::cout << endl << endl << "   Val Cost:" << endl;
-        printf("            ");
+        std::cout << "            ";
         for (int l=0; l<myData->nbBreakpoints; l++) 
-            printf("         l = %2d", l);
+            std::cout << "         l = " << std::setw(2) << l;
         std::cout << endl;
 
         for (int k=0; k<myData->nbFolds; k++) {
-            printf("   k = %2d   ", k);
+            std::cout << "   k = " << std::setw(2) << k << "   ";
             for (int l=0; l<myData->nbBreakpoints; l++) {
                 std::cout << std::setw(15) << spSolutions[k][l]->valCost;
             }
             std::cout << endl;
         }
-        printf("  Average   ");
+        std::cout << "  Average   ";
         for (int l=0; l<myData->nbBreakpoints; l++) {
             std::cout << std::setw(15) << mySolutionGS->avgValCostVector[l];
         }
@@ -866,9 +866,9 @@ int SolverGridSearchCV::solve()
 
     // Print optimal solution
     std::cout << endl << "Optimal solution:" << endl;
-    printf("Regularization parameter:   %0.5f\n", myData->regularizationParam);
-    printf("Training cost:              %0.5f\n", finalSolution->trainCost);
-    printf("Validation cost:            %0.5f\n", finalSolution->valCost);
+    std::cout << "Regularization parameter:   " << std::fixed << std::setprecision(5) << myData->regularizationParam << std::endl;
+    std::cout << "Training cost:              " << std::fixed << std::setprecision(5) << finalSolution->trainCost << std::endl;
+    std::cout << "Validation cost:            " << std::fixed << std::setprecision(5) << finalSolution->valCost << std::endl;
     std::cout << endl;
 
     myData->timeLimit = origTimeLimit;

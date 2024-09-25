@@ -222,10 +222,10 @@ int SolverERM::solve()
     error = solverGetModelDimensions(env, model, numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
     if (error) return error;
 
-    printf("Number of columns: %d\n", numcols);
-    printf("Number of rows: %d\n", numrows);
-    printf("Number of linear constraints: %d\n", cur_numlconstrs);
-    printf("Number of indicator constraints: %d\n", cur_numgenconstrs);    
+    std::cout << "Number of columns: " << numcols << std::endl;
+    std::cout << "Number of rows: " << numrows << std::endl;
+    std::cout << "Number of linear constraints: " << cur_numlconstrs << std::endl;
+    std::cout << "Number of indicator constraints: " << cur_numgenconstrs << std::endl;
 
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
@@ -245,10 +245,9 @@ int SolverERM::solve()
     string stat_str = getSolverStatusString(lpstat);
 
     // Print results
-    printf("\n");
-    printf("Solution status:                   %d (%s) \n", lpstat, stat_str.c_str());
-    printf("Objective value:                   %0.10f \n", objval);
-    // printf("Objective lower bound:             %0.10f \n", bestobjval);
+    std::cout << std::endl;
+    std::cout << "Solution status:                   " << lpstat << " (" << stat_str << ")" << std::endl;
+    std::cout << "Objective value:                   " << std::setprecision(10) << objval << std::endl;
     std::cout << endl;
 
     std::cout << std::setw(10) << "beta" << endl; 
@@ -350,10 +349,10 @@ int SolverERM_l0::solve()
     error = solverGetModelDimensions(env, model, numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
     if (error) return error;
 
-    printf("Number of columns: %d\n", numcols);
-    printf("Number of rows: %d\n", numrows);
-    printf("Number of linear constraints: %d\n", cur_numlconstrs);
-    printf("Number of indicator constraints: %d\n", cur_numgenconstrs);    
+    std::cout << "Number of columns: " << numcols << std::endl;
+    std::cout << "Number of rows: " << numrows << std::endl;
+    std::cout << "Number of linear constraints: " << cur_numlconstrs << std::endl;
+    std::cout << "Number of indicator constraints: " << cur_numgenconstrs << std::endl;
 
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
@@ -373,12 +372,12 @@ int SolverERM_l0::solve()
     string stat_str = getSolverStatusString(lpstat);
 
     // Print results
-    printf("\n");
-    printf("Solution status:                   %d (%s) \n", lpstat, stat_str.c_str());
-    printf("Objective value:                   %0.10f \n", objval);
-    printf("Objective lower bound:             %0.10f \n", bestobjval);
-    printf("MIP Relative objective gap:        %0.10f \n", mipgap);
-    printf("Nodes processed:                   %d \n", (int) nodecount);
+    std::cout << std::endl;
+    std::cout << "Solution status:                   " << lpstat << " (" << stat_str << ")" << std::endl;
+    std::cout << "Objective value:                   " << std::setprecision(10) << objval << std::endl;
+    std::cout << "Objective lower bound:             " << std::setprecision(10) << bestobjval << std::endl;
+    std::cout << "MIP Relative objective gap:        " << std::setprecision(10) << mipgap << std::endl;
+    std::cout << "Nodes processed:                   " << static_cast<int>(nodecount) << std::endl;
     std::cout << endl;
 
     std::cout << std::setw(10) << "beta" << std::setw(5) << "z" << endl; 
@@ -564,11 +563,11 @@ int SolverERM_l1::solve()
     error = solverGetModelDimensions(env, model, numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
     if (error) return error;
 
-    printf("Number of columns: %d\n", numcols);
-    printf("Number of rows: %d\n", numrows);
-    printf("Number of linear constraints: %d\n", cur_numlconstrs);
-    printf("Number of indicator constraints: %d\n", cur_numgenconstrs);    
-
+    std::cout << "Number of columns: " << numcols << std::endl;
+    std::cout << "Number of rows: " << numrows << std::endl;
+    std::cout << "Number of linear constraints: " << cur_numlconstrs << std::endl;
+    std::cout << "Number of indicator constraints: " << cur_numgenconstrs << std::endl;
+    
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
         fprintf(stderr, "ERROR: There is something wrong with the model. \n");
@@ -587,10 +586,9 @@ int SolverERM_l1::solve()
     string stat_str = getSolverStatusString(lpstat);
 
     // Print results
-    printf("\n");
-    printf("Solution status:                   %d (%s) \n", lpstat, stat_str.c_str());
-    printf("Objective value:                   %0.10f \n", objval);
-    // printf("Objective lower bound:             %0.10f \n", bestobjval);
+    std::cout << std::endl;
+    std::cout << "Solution status:                   " << lpstat << " (" << stat_str << ")" << std::endl;
+    std::cout << "Objective value:                   " << std::setprecision(10) << objval << std::endl;
     std::cout << endl;
 
     int w = 10;

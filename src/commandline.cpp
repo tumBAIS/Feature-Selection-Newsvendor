@@ -60,10 +60,10 @@ commandline::commandline(int argc, char *argv[])
 		cout << "ERROR: invalid command line" << endl;
 		cout << "USAGE: ./executable problem_type instance_path backorder_cost holding_cost [--split train_val_split] [--split_size subset_samples] [--lambda regularization_param] [--folds k] [--breakpts n_bpts] [-t time_limit] [--threads nb_threads] [-o out_path]" << endl;
 		
-		printf("I received the following %d arguments: \n", argc);
+		cout << "I received the following " << argc << " arguments: " << endl;
 		for (int i=0; i<argc; i++)
 		{
-			printf("i=%d \t argv[%d] = %s \n", i, i, argv[i]);
+			cout << "i=" << i << "\t argv[" << i << "] = " << argv[i] << endl;
 		}
 		return;
 	}
