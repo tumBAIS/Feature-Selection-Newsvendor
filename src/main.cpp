@@ -24,12 +24,14 @@ int main(int argc, char *argv[])
         if (c.is_valid())
         {
             // Parsing the problem instance
-            auto myData = std::make_shared<Pb_Data>(c.get_instance_path(), c.get_instance_filename(), c.get_output_path(),
+            auto myData = std::make_shared<Pb_Data>(c.get_instance_path(), 
+                             c.get_instance_filename(), c.get_output_path(),
                              c.get_backorder_cost(), c.get_holding_cost(), 
                              c.get_problem_type(), c.get_str_problem_type(), 
-                             c.get_train_val_split(), c.get_split_size(), c.get_split_feat(),
-                             c.get_regularization_param(), c.get_nb_folds(), c.get_nb_breakpoints(),
-                             c.get_nbThreads(), c.get_timeLimit(), c.get_informative_factor(),
+                             c.get_train_val_split(), c.get_split_size(), 
+                             c.get_split_feat(), c.get_regularization_param(), 
+                             c.get_nb_folds(), c.get_nb_breakpoints(),
+                             c.get_nbThreads(), c.get_timeLimit(), 
                              c.get_set_value_z());
             
             // Begin of clock

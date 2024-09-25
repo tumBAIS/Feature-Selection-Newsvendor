@@ -28,7 +28,7 @@ Then, activate the environment and run `python generate_instances.py` to create 
 
 All parameters are passed by CLI arguments to the executable file `newsvendor-features` using:
 
-`./executable problem_type instance_path backorder_cost holding_cost [-split train_val_split] [-split_size subset_samples] [-lambda regularization_param] [-folds k] [-breakpts n_bpts] [-t time_limit] [-threads nb_threads] [-o out_path] [-i informative_factor]`
+`./executable problem_type instance_path backorder_cost holding_cost [-split train_val_split] [-split_size subset_samples] [-lambda regularization_param] [-folds k] [-breakpts n_bpts] [-t time_limit] [-threads nb_threads] [-o out_path]`
 
 The following CLI arguments are available:
 

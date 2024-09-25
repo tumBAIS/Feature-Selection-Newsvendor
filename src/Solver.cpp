@@ -566,25 +566,6 @@ int SolverBilevel::solve()
     // Add indicator constraints related to the dual variables mu and gamma
     if (status = addDualIndConstrs(env, model)) return status;
 
-    // Add constraints that limit the number of active features <= nbInformativeFeatures * informativeFactor
-    if (myData->informativeFactor > 0)
-    {
-        int rmatind[myData->nbFeatures];
-        double rmatval[myData->nbFeatures];   
-        int beg = 0;
-        double rhs = (double) myData->nbInformativeFeatures * myData->informativeFactor;
-        char sense = 'L';
-        char *rowname = new char[100];
-        sprintf(rowname, "informative_limit");
-        for (int j=0; j<myData->nbFeatures; j++) {
-            rmatind[j] = sizeU + sizeO + sizeBeta + sizeMu + sizeGamma + j;
-            rmatval[j] = 1; 
-        }
-        status = solverAddRows(env, model, 1, myData->nbFeatures, &rhs, &sense, &beg, rmatind, rmatval, &rowname);
-        delete[] rowname;
-        if (status) return status;
-    }
-
     int sizeConstrs = 2*myData->nbSamples + 2*myData->nbTrainSamples + 2*myData->nbFeatures + 1;
 
     if (debug)
@@ -1210,28 +1191,6 @@ int SolverBilevelShuffleSplit::solve()
     if (status = addDualIndConstrs(env, model)) return status;
 
     int sizeConstrs = 2*myData->splitSize*myData->nbFolds + myData->nbFolds + 2*myData->splitTrainSize*myData->nbFolds + 2*myData->nbFeatures*myData->nbFolds;
-
-    // Add constraints that limit the number of active features <= nbInformativeFeatures * informativeFactor
-    if (myData->informativeFactor > 0)
-    {
-        int rmatind[myData->nbFeatures];
-        double rmatval[myData->nbFeatures];
-        int beg = 0;
-        double rhs = ((double) myData->nbInformativeFeatures) * myData->informativeFactor;
-        char sense = 'L';
-        char *rowname = new char[100];
-        sprintf(rowname, "informative_limit");
-
-        for (int j=0; j<myData->nbFeatures; j++) 
-        {
-            rmatind[j] = sizeU + sizeO + sizeBeta + sizeMu + sizeGamma + j;
-            rmatval[j] = 1; 
-        }
-        status = solverAddRows(env, model, 1, myData->nbFeatures, &rhs, &sense, &beg, rmatind, rmatval, &rowname);
-        delete[] rowname;
-        if (status) return status;
-        sizeConstrs++;
-    }
 
     if (debug)
         std::cout << "Added all constraints - OK" << endl;

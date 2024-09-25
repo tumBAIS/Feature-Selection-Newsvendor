@@ -112,9 +112,6 @@ public:
     // number of informative features
     int nbInformativeFeatures;
 
-    // informative factor (specifies the ratio of the number of informative features)
-    double informativeFactor;
-
     // number of features to be active in the solution
     int numActiveFeatures = -1;
 
@@ -217,8 +214,7 @@ public:
             double backOrderCost, double holdingCost, ProblemType problemType, 
             string strProblemType, double trainValSplit, int splitSize, 
             double splitFeatures, double regularizationParam, int nbFolds, 
-            int nbBreakpoints, int nbThreads, double timeLimit, 
-            double informativeFactor, bool set_value_z);
+            int nbBreakpoints, int nbThreads, double timeLimit, bool set_value_z);
 };
 
 #endif

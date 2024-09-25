@@ -418,7 +418,6 @@ void Solution::exportSolution(string ext)
         myFile << "nb_samples" << myData->sep << myData->nbSamples << endl;
         myFile << "nb_features" << myData->sep << myData->nbFeatures << endl;
         myFile << "nb_informative_features" << myData->sep << myData->nbInformativeFeatures << endl;
-        myFile << "informative_factor" << myData->sep << myData->informativeFactor << endl;
         myFile << "train_val_split" << myData->sep << myData->trainValSplit << endl;
         myFile << "nb_train_samples" << myData->sep << myData->nbTrainSamples << endl;
         myFile << "nb_val_samples" << myData->sep << myData->nbValSamples << endl;

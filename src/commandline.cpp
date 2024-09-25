@@ -50,18 +50,17 @@ commandline::commandline(int argc, char *argv[])
 	this->regularization_param = 0;
 	this->nb_folds = -1;
 	this->nb_breakpoints = -1;
-	this->output_path = "Output/";
-	this->informativeFactor = -1; // do not include these constraints
+	this->output_path = "output/";
 	this->set_value_z = false;
 
 	int numRequiredParams = 5;
-	int numDefaultParams = 22;
+	int numDefaultParams = 20;
 
 	// Read in options
     if ((argc % 2 != (numRequiredParams % 2)) || (argc > numRequiredParams+numDefaultParams) || (argc < numRequiredParams))
 	{
 		cout << "ERROR: invalid command line" << endl;
-		cout << "USAGE: ./executable problem_type instance_path backorder_cost holding_cost [-split train_val_split] [-split_size subset_samples] [-split_feat subset_features] [-lambda regularization_param] [-folds k] [-breakpts n_bpts] [-t time_limit] [-threads nb_threads] [-o out_path] [-i informative_factor] [-setz set_val_z]" << endl;
+		cout << "USAGE: ./executable problem_type instance_path backorder_cost holding_cost [-split train_val_split] [-split_size subset_samples] [-split_feat subset_features] [-lambda regularization_param] [-folds k] [-breakpts n_bpts] [-t time_limit] [-threads nb_threads] [-o out_path] [-setz set_val_z]" << endl;
 		
 		printf("I received the following %d arguments: \n", argc);
 		for (int i=0; i<argc; i++)
@@ -172,9 +171,6 @@ commandline::commandline(int argc, char *argv[])
 
 			else if (string(argv[i]) == "-o")
 				this->output_path = argv[i+1];
-
-			else if (string(argv[i]) == "-i")
-				this->informativeFactor = atof(argv[i+1]);
 
 			else if (string(argv[i]) == "-setz")
 			{
@@ -354,11 +350,6 @@ int commandline::get_nb_folds()
 int commandline::get_nb_breakpoints()
 {
 	return nb_breakpoints;
-}
-
-double commandline::get_informative_factor()
-{
-	return informativeFactor;
 }
 
 bool commandline::get_set_value_z()

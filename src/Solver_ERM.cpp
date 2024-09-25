@@ -331,32 +331,7 @@ int SolverERM_l0::solve()
     if (error = addBetaIndConstrs(env, model, sizeU+sizeO, sizeU+sizeO+sizeBeta)) return error;
 
     int sizeConstrs = 2*myData->nbSamples + myData->nbFeatures;
-
-    // Add constraints that limit the number of active features <= nbInformativeFeatures * informativeFactor
-    if (myData->informativeFactor > 0)
-    {
-        int rmatind[myData->nbFeatures];
-        double rmatval[myData->nbFeatures];
-        
-        int beg = 0;
-        double rhs = ((double) myData->nbInformativeFeatures) * myData->informativeFactor;
-        char sense = 'L';
-        char *rowname = new char[100];
-        sprintf(rowname, "informative_limit");
-
-        for (int j=0; j<myData->nbFeatures; j++) 
-        {
-            rmatind[j] = sizeU + sizeO + sizeBeta + j;
-            rmatval[j] = 1; 
-        }
-        error = solverAddRows(env, model, 1, myData->nbFeatures, &rhs, &sense, &beg, rmatind, rmatval, &rowname);
-        if (error) return error;
-
-        delete[] rowname;
-
-        sizeConstrs++;
-    }
-
+    
     // Write problem to file
     if (myData->save_model)
     {

@@ -53,9 +53,6 @@ private:
 	// number of breakpoints for grid search
 	int nb_breakpoints;
 
-	// informative factor
-	double informativeFactor;
-
 	// set value for variable z
 	bool set_value_z;
 
@@ -122,9 +119,6 @@ public:
 
 	// get CPLEX time limit
 	double get_timeLimit();
-
-	// get informative factor
-	double get_informative_factor();
 
 	// set value for variable z ?
 	bool get_set_value_z();
