@@ -122,32 +122,28 @@ vector<double> logspace(const double start, const double end,
     return logspaced;
 }
 
-int Solver::quit_solver(void *env, void *model)
+int Solver::quit_solver()
 {
     int status = 0;
     char errbuf[CPXMESSAGEBUFSIZE];
 
-    CPXLPptr lp = (CPXLPptr) model;
-
     // Free the problem as allocated by CPXcreateprob and CPXreadcopyprob, if necessary
-    if (lp != NULL) {
-        int xstatus = CPXfreeprob((CPXENVptr) env, &lp);
+    if (model != NULL) {
+        int xstatus = CPXfreeprob(env, &model);
         if (!status) status = xstatus;
         if (status) {
             std::cerr << "Failed to free memory for problem: " 
-                << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
-                << std::endl;
+                << CPXgeterrorstring(env, status, errbuf) << std::endl;
         }
     }
 
     // Free the CPLEX environment, if necessary
     if (env != NULL) {
-        int xstatus = CPXcloseCPLEX((CPXENVptr *) &env);
+        int xstatus = CPXcloseCPLEX(&env);
         if (!status) status = xstatus;
         if (status) {
             std::cerr << "Failed to close CPLEX: " 
-                << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
-                << std::endl;
+                << CPXgeterrorstring(env, status, errbuf) << std::endl;
         }
     }
     return status;
@@ -160,59 +156,58 @@ int Solver::initializeModel(int logToConsole, char const *modelname)
     this->env = CPXopenCPLEX(&status); // Open CPLEX environment
     if (status) return status;
 
-    CPXsetintparam((CPXENVptr) this->env, CPXPARAM_ScreenOutput, logToConsole); // Switching ON the display
-    CPXsetintparam((CPXENVptr) this->env, CPXPARAM_Read_DataCheck, CPX_DATACHECK_WARN); // Print warnings
-    CPXsetintparam((CPXENVptr) this->env, CPX_PARAM_THREADS, myData->nbThreads);		  // number of threads
-    CPXsetdblparam((CPXENVptr) this->env, CPX_PARAM_TILIM, myData->timeLimit); // sets time limit for the solver.
+    CPXsetintparam(this->env, CPXPARAM_ScreenOutput, logToConsole); // Switching ON the display
+    CPXsetintparam(this->env, CPXPARAM_Read_DataCheck, CPX_DATACHECK_WARN); // Print warnings
+    CPXsetintparam(this->env, CPX_PARAM_THREADS, myData->nbThreads);		  // number of threads
+    CPXsetdblparam(this->env, CPX_PARAM_TILIM, myData->timeLimit); // sets time limit for the solver.
 
-    this->model = CPXcreateprob((CPXENVptr) this->env, &status, modelname); // Create LP problem as a container
+    this->model = CPXcreateprob(this->env, &status, modelname); // Create LP problem as a container
     return status;
 }
 
-int Solver::solverAddCols(void *env, void *model, int ccnt, double *obj, double *lb, double *ub, char *vtype, char **colname)
+int Solver::solverAddCols(int ccnt, double *obj, double *lb, double *ub, char *vtype, char **colname)
 {
     int status = 0;
 
     char errbuf[CPXMESSAGEBUFSIZE];
-    status = CPXnewcols((CPXENVptr) env, (CPXLPptr) model, ccnt, obj, lb, ub, vtype, colname);
+    status = CPXnewcols(env, model, ccnt, obj, lb, ub, vtype, colname);
     if (status) {
         std::cerr << "Failed to add variables: " 
-            << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
-            << std::endl;
+            << CPXgeterrorstring(env, status, errbuf) << std::endl;
     }
     return status;
 }
 
-int Solver::solverAddRows(void *env, void *model, int rcnt, int nzcnt, double *rhs, char *sense, int *rmatbeg, int *rmatind, double *rmatval, char **rowname)
+int Solver::solverAddRows(int rcnt, int nzcnt, double *rhs, char *sense, int *rmatbeg, int *rmatind, double *rmatval, char **rowname)
 {
     int status = 0;
 
-    status = CPXaddrows((CPXENVptr) env, (CPXLPptr) model, 0, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, NULL, rowname);
+    status = CPXaddrows(env, model, 0, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, NULL, rowname);
     return status;
 }
 
-int Solver::solverAddIndConstr(void *env, void *model, int indvar, int complemented, int nzcnt, double rhs, int sense, int *linind, double *linval, char *indname_str)
+int Solver::solverAddIndConstr(int indvar, int complemented, int nzcnt, double rhs, int sense, int *linind, double *linval, char *indname_str)
 {
     int status = 0;
 
-    status = CPXaddindconstr((CPXENVptr) env, (CPXLPptr) model, indvar, complemented, nzcnt, rhs, sense, linind, linval, indname_str);
+    status = CPXaddindconstr(env, model, indvar, complemented, nzcnt, rhs, sense, linind, linval, indname_str);
     return status;
 }
 
-int Solver::solverWriteModel(void *env, void *model, char const *filename)
+int Solver::solverWriteModel(char const *filename)
 {
     int status = 0;
 
-    status = CPXwriteprob((CPXENVptr) env, (CPXLPptr) model, filename, NULL); // Exporting the model
+    status = CPXwriteprob(env, model, filename, NULL); // Exporting the model
     return status;
 }
 
-int Solver::solverGetModelDimensions(void *env, void *model, int& numcols, int& numlinconstrs, int& numindconstrs, int& numrows)
+int Solver::solverGetModelDimensions(int& numcols, int& numlinconstrs, int& numindconstrs, int& numrows)
 {
     int status = 0;
-    numcols = CPXgetnumcols((CPXENVptr) env, (CPXLPptr) model); // Get number of columns
-    numlinconstrs = CPXgetnumrows((CPXENVptr) env, (CPXLPptr) model); // Get number of rows 
-    numindconstrs = CPXgetnumindconstrs((CPXENVptr) env, (CPXLPptr) model); // Get number of indicator constraints
+    numcols = CPXgetnumcols(env, model); // Get number of columns
+    numlinconstrs = CPXgetnumrows(env, model); // Get number of rows 
+    numindconstrs = CPXgetnumindconstrs(env, model); // Get number of indicator constraints
     numrows = numlinconstrs + numindconstrs;
     return status;
 }
@@ -223,14 +218,13 @@ int Solver::solverOptimize(ModelType model_type)
 
     char errbuf[CPXMESSAGEBUFSIZE];
     if (model_type == LP_PROBLEM) {
-        status = CPXlpopt((CPXENVptr) env, (CPXLPptr) model);
+        status = CPXlpopt(env, model);
     } else if (model_type == MIP_PROBLEM) {
-        status = CPXmipopt((CPXENVptr) env, (CPXLPptr) model);
+        status = CPXmipopt(env, model);
     }
     if (status) {
         std::cerr << "Failed to optimize: " 
-            << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
-            << std::endl;
+            << CPXgeterrorstring(env, status, errbuf) << std::endl;
     }
     return status;
 }
@@ -240,32 +234,29 @@ int Solver::solverRetrieveSolution(int *modelstatus, double *objval, double *bes
     int status = 0;
 
     char errbuf[CPXMESSAGEBUFSIZE];
-    status = CPXsolution((CPXENVptr) env, (CPXLPptr) model, modelstatus, objval, solution, NULL, NULL, NULL); // Get solution array
+    status = CPXsolution(env, model, modelstatus, objval, solution, NULL, NULL, NULL); // Get solution array
     if (status) {
         std::cerr << "Failed to retrieve solution: " 
-            << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
-            << std::endl;
+            << CPXgeterrorstring(env, status, errbuf) << std::endl;
     }
 
     if (nodecount){
-        *nodecount = CPXgetnodecnt((CPXENVptr) env, (CPXLPptr) model); // Get node count
+        *nodecount = CPXgetnodecnt(env, model); // Get node count
     }
 
     if (mipgap) {
-        status = CPXgetmiprelgap((CPXENVptr) env, (CPXLPptr) model, mipgap); // Get MIP gap
+        status = CPXgetmiprelgap(env, model, mipgap); // Get MIP gap
         if (status) {
             std::cerr << "Failed to retrieve MIP gap: " 
-                << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
-                << std::endl;
+                << CPXgeterrorstring(env, status, errbuf) << std::endl;
         }
     }
 
     if (bestobjval) {
-        status = CPXgetbestobjval((CPXENVptr) env, (CPXLPptr) model, bestobjval); // Get best objective value
+        status = CPXgetbestobjval(env, model, bestobjval); // Get best objective value
         if (status) {
             std::cerr << "Failed to retrieve best obj val: " 
-                << CPXgeterrorstring(static_cast<CPXENVptr>(env), status, errbuf) 
-                << std::endl;
+                << CPXgeterrorstring(env, status, errbuf) << std::endl;
         }
     }
     return status;
@@ -287,7 +278,7 @@ int SolverBilevel::addUnderageVariables(int& size)
         namesU[i] = new char[100];
 		sprintf(namesU[i], "u_%d", i);
 	}
-    int status = solverAddCols(env, model, sizeU, costU, NULL, NULL, NULL, namesU);
+    int status = solverAddCols(sizeU, costU, NULL, NULL, NULL, namesU);
     for (int i = 0; i < sizeU; i++)
 		delete[] namesU[i];
     delete[] namesU;
@@ -311,7 +302,7 @@ int SolverBilevel::addOverageVariables(int& size)
         namesO[i] = new char[100];
 		sprintf(namesO[i], "o_%d", i);
 	}
-    int status = solverAddCols(env, model, sizeO, costO, NULL, NULL, NULL, namesO);
+    int status = solverAddCols(sizeO, costO, NULL, NULL, NULL, namesO);
 
     for (int i = 0; i < sizeO; i++)
 		delete[] namesO[i];
@@ -335,7 +326,7 @@ int SolverBilevel::addDualMuVariables(int& size)
         namesMu[i] = new char[100];
 		sprintf(namesMu[i], "mu_%d", i);
 	}
-    int status = solverAddCols(env, model, sizeMu, NULL, lbMu, ubMu, NULL, namesMu);
+    int status = solverAddCols(sizeMu, NULL, lbMu, ubMu, NULL, namesMu);
 
     for (int i = 0; i < sizeMu; i++)
 		delete[] namesMu[i];
@@ -359,7 +350,7 @@ int SolverBilevel::addDualGammaVariables(int& size)
         namesGamma[i] = new char[100];
 		sprintf(namesGamma[i], "gamma_%d", i);
 	}
-    int status = solverAddCols(env, model, sizeGamma, NULL, lbGamma, ubGamma, NULL, namesGamma);
+    int status = solverAddCols(sizeGamma, NULL, lbGamma, ubGamma, NULL, namesGamma);
     
     for (int i = 0; i < sizeGamma; i++)
 		delete[] namesGamma[i];
@@ -399,7 +390,7 @@ int SolverBilevel::addFollowerOptConstr()
         rmatind[i+3*myData->nbTrainSamples] = 2*myData->nbSamples + myData->nbFeatures + myData->nbTrainSamples + i;
         rmatval[i+3*myData->nbTrainSamples] = - myData->demand[i];
     }
-    int status = solverAddRows(env, model, 1, nzcnt, &rhs, &sense, &beg, rmatind, rmatval, &rowname);
+    int status = solverAddRows(1, nzcnt, &rhs, &sense, &beg, rmatind, rmatval, &rowname);
 
     delete[] rowname;
 
@@ -427,7 +418,7 @@ int SolverBilevel::addDualMuConstrs()
         rowname[i] = new char[100];
         sprintf(rowname[i], "dual_mu(%d)", i);
     }
-    int status = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
@@ -456,7 +447,7 @@ int SolverBilevel::addDualGammaConstrs()
         rowname[i] = new char[100];
         sprintf(rowname[i], "dual_gamma(%d)", i);
     }
-    int status = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
@@ -486,7 +477,7 @@ int SolverBilevel::addDualIndConstrs()
         indvar = 2*myData->nbSamples + myData->nbFeatures + 2*myData->nbTrainSamples + j;
         indname_str = new char[100];
         sprintf(indname_str, "indDual(%d)", j);
-        status = solverAddIndConstr(env, model, indvar, false, nzcnt, 0, 'E', linind, linval, indname_str);
+        status = solverAddIndConstr(indvar, false, nzcnt, 0, 'E', linind, linval, indname_str);
         if (status) return status;
         delete[] indname_str;
 	}
@@ -544,7 +535,7 @@ int SolverBilevel::solve()
         namesZ[j] = new char[100];
 		sprintf(namesZ[j], "z_%d", j);
 	}
-    status = solverAddCols(env, model, sizeZ, NULL, lbZ, ubZ, xctypeZ, namesZ);
+    status = solverAddCols(sizeZ, NULL, lbZ, ubZ, xctypeZ, namesZ);
     for (int j = 0; j < sizeZ; j++)
 		delete[] namesZ[j];
     delete[] namesZ;
@@ -590,7 +581,7 @@ int SolverBilevel::solve()
     {
         string ext = ".lp";
         string model_path = mySolution->getOutputFilename(ext);
-        status = solverWriteModel(env, model, model_path.c_str()); // Exporting the model
+        status = solverWriteModel(model_path.c_str()); // Exporting the model
         if (status) return status;
     }
 
@@ -600,7 +591,7 @@ int SolverBilevel::solve()
 
     // Get the size of the model
     int numcols, numlinconstrs, numindconstrs, numrows;
-    status = solverGetModelDimensions(env, model, numcols, numlinconstrs, numindconstrs, numrows);
+    status = solverGetModelDimensions(numcols, numlinconstrs, numindconstrs, numrows);
     if (status) return status;
 
     std::cout << "Number of columns: " << numcols << std::endl;
@@ -611,7 +602,7 @@ int SolverBilevel::solve()
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
         std::cerr << "ERROR: There is something wrong with the rows or columns of the model." << std::endl;
-        quit_solver(env, model);
+        quit_solver();
         return 1;
     }
 
@@ -638,7 +629,7 @@ int SolverBilevel::solve()
     // Create new solution structure
     this->mySolution->update(numcols, numrows, lpstat, stat_str, objval, bestobjval, nodecount, mipgap, solution);
 
-    status = quit_solver(env, model);
+    status = quit_solver();
 
     return status;
 }
@@ -671,7 +662,7 @@ int SolverBilevelShuffleSplit::addUnderageVariables(int& size)
             r++;
         }
     }
-	int status = solverAddCols(env, model, sizeU, costU, NULL, NULL, NULL, namesU);
+	int status = solverAddCols(sizeU, costU, NULL, NULL, NULL, namesU);
     
     for (int r = 0; r < sizeU; r++)
 		delete[] namesU[r];
@@ -707,7 +698,7 @@ int SolverBilevelShuffleSplit::addOverageVariables(int& size)
             r++;
         }
     }
-	int status = solverAddCols(env, model, sizeO, costO, NULL, NULL, NULL, namesO);
+	int status = solverAddCols(sizeO, costO, NULL, NULL, NULL, namesO);
 
     for (int r = 0; r < sizeO; r++)
 		delete[] namesO[r];
@@ -739,7 +730,7 @@ int SolverBilevelShuffleSplit::addBetaVariables(int& size)
             r++;
         }
     }
-	int status = solverAddCols(env, model, sizeBeta, NULL, lbBeta, ubBeta, NULL, namesBeta);
+	int status = solverAddCols(sizeBeta, NULL, lbBeta, ubBeta, NULL, namesBeta);
 
     for (int r = 0; r < sizeBeta; r++)
 		delete[] namesBeta[r];
@@ -768,7 +759,7 @@ int SolverBilevelShuffleSplit::addDualMuVariables(int& size)
             }
         }
     }
-	int status = solverAddCols(env, model, sizeMu, NULL, lbMu, ubMu, NULL, namesMu);
+	int status = solverAddCols(sizeMu, NULL, lbMu, ubMu, NULL, namesMu);
 
     for (int r = 0; r < sizeMu; r++)
 		delete[] namesMu[r];
@@ -801,7 +792,7 @@ int SolverBilevelShuffleSplit::addDualGammaVariables(int& size)
             }
         }
     }
-	int status = solverAddCols(env, model, sizeGamma, NULL, lbGamma, ubGamma, NULL, namesGamma);
+	int status = solverAddCols(sizeGamma, NULL, lbGamma, ubGamma, NULL, namesGamma);
 
     for (int r = 0; r < sizeGamma; r++)
 		delete[] namesGamma[r];
@@ -829,7 +820,7 @@ int SolverBilevelShuffleSplit::addZVariables(int& size)
         namesZ[j] = new char[100];
 		sprintf(namesZ[j], "z_%d", j);
 	}
-	int status = solverAddCols(env, model, sizeZ, NULL, lbZ, NULL, xctypeZ, namesZ);
+	int status = solverAddCols(sizeZ, NULL, lbZ, NULL, xctypeZ, namesZ);
     
     for (int j = 0; j < sizeZ; j++)
 		delete[] namesZ[j];
@@ -874,7 +865,7 @@ int SolverBilevelShuffleSplit::addUnderageConstrs()
             r++;
         }
     }
-    int status = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int r = 0; r < rcnt; r++)
 		delete[] rowname[r];
@@ -918,7 +909,7 @@ int SolverBilevelShuffleSplit::addOverageConstrs()
             r++;
         }
     }
-    int status = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int r = 0; r < rcnt; r++)
 		delete[] rowname[r];
@@ -945,7 +936,7 @@ int SolverBilevelShuffleSplit::addBetaIndConstrs(const int startBeta, const int 
                 val = 1;
                 indname_str = new char[100];
                 sprintf(indname_str, "indBeta(%d,%d)", k, j);
-                status = solverAddIndConstr(env, model, indvar, true, 1, 0, 'E', &ind, &val, indname_str);
+                status = solverAddIndConstr(indvar, true, 1, 0, 'E', &ind, &val, indname_str);
                 delete[] indname_str;
                 if (status) return status;
             }
@@ -1009,7 +1000,7 @@ int SolverBilevelShuffleSplit::addFollowerOptConstr()
         rowname[k] = new char[100];
         sprintf(rowname[k], "follower_opt(%d)", k);
     }
-    int status = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int r = 0; r < rcnt; r++)
 		delete[] rowname[r];
@@ -1048,7 +1039,7 @@ int SolverBilevelShuffleSplit::addDualMuConstrs(const int startMu)
             }         
         }
     }
-    int status = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
@@ -1086,7 +1077,7 @@ int SolverBilevelShuffleSplit::addDualGammaConstrs(const int startGamma)
             }
         }
     }
-    int status = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
@@ -1129,7 +1120,7 @@ int SolverBilevelShuffleSplit::addDualIndConstrs()
             
             if (myData->activeFeatures[k][j] == 1) // only include this contraint if feature j is active in fold k
             {
-                status = solverAddIndConstr(env, model, indvar, false, nzcnt, 0, 'E', linind, linval, indname_str);
+                status = solverAddIndConstr(indvar, false, nzcnt, 0, 'E', linind, linval, indname_str);
                 if (status) return status;
             }
             delete[] indname_str;
@@ -1214,7 +1205,7 @@ int SolverBilevelShuffleSplit::solve()
     {
         string ext = ".lp";
         string model_path = mySolution->getOutputFilename(ext);
-        status = solverWriteModel(env, model, model_path.c_str()); // Exporting the model
+        status = solverWriteModel(model_path.c_str()); // Exporting the model
         if (status) return status;
     }
 
@@ -1224,7 +1215,7 @@ int SolverBilevelShuffleSplit::solve()
     
     // Get the size of the model
     int numcols, numlinconstrs, numindconstrs, numrows;
-    status = solverGetModelDimensions(env, model, numcols, numlinconstrs, numindconstrs, numrows);
+    status = solverGetModelDimensions(numcols, numlinconstrs, numindconstrs, numrows);
     if (status) return status;
 
     std::cout << "Number of columns: " << numcols << std::endl;
@@ -1235,7 +1226,7 @@ int SolverBilevelShuffleSplit::solve()
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
         std::cerr << "ERROR: There is something wrong with the model dimensions." << std::endl;
-        quit_solver(env, model);
+        quit_solver();
         return 1;
     }
 
@@ -1275,7 +1266,7 @@ int SolverBilevelShuffleSplit::solve()
     // Create new solution structure
     this->mySolution->update(numcols, numrows, lpstat, stat_str, objval, bestobjval, nodecount, mipgap, solution);
 
-    status = quit_solver(env, model);
+    status = quit_solver();
 
     return status;
 }

@@ -17,7 +17,7 @@ int SolverERM::addUnderageVariables(int& size)
         namesU[i] = new char[100];
 		sprintf(namesU[i], "u_%d", i);
 	}
-    int status = solverAddCols(env, model, sizeU, costU, NULL, NULL, NULL, namesU);
+    int status = solverAddCols(sizeU, costU, NULL, NULL, NULL, namesU);
     for (int i = 0; i < sizeU; i++)
 		delete[] namesU[i];
     delete[] namesU;
@@ -38,7 +38,7 @@ int SolverERM::addOverageVariables(int &size)
         namesO[i] = new char[100];
 		sprintf(namesO[i], "o_%d", i);
 	}
-    int status = solverAddCols(env, model, sizeO, costO, NULL, NULL, NULL, namesO);
+    int status = solverAddCols(sizeO, costO, NULL, NULL, NULL, namesO);
     for (int i = 0; i < sizeO; i++)
 		delete[] namesO[i];
     delete[] namesO;
@@ -59,7 +59,7 @@ int Solver::addBetaVariables(int& size)
         namesBeta[j] = new char[100];
 		sprintf(namesBeta[j], "beta_%d", j);
 	}
-    int status = solverAddCols(env, model, sizeBeta, NULL, lbBeta, NULL, NULL, namesBeta);
+    int status = solverAddCols(sizeBeta, NULL, lbBeta, NULL, NULL, namesBeta);
 
     for (int j = 0; j < sizeBeta; j++)
 		delete[] namesBeta[j];
@@ -96,7 +96,7 @@ int Solver::addUnderageConstrs()
         rowname[i] = new char[100];
         sprintf(rowname[i], "underage(%d)", i);
     }
-    int error = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int error = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
@@ -132,7 +132,7 @@ int Solver::addOverageConstrs()
         rowname[i] = new char[100];
         sprintf(rowname[i], "overage(%d)", i);
     }
-    int error = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+    int error = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
@@ -156,7 +156,7 @@ int Solver::addBetaIndConstrs(const int startBeta, const int startZ)
         val = 1;
         indname_str = new char[100];
         sprintf(indname_str, "indBeta(%d)", j);
-        error = solverAddIndConstr(env, model, indvar, true, 1, 0, 'E', &ind, &val, indname_str);
+        error = solverAddIndConstr(indvar, true, 1, 0, 'E', &ind, &val, indname_str);
         delete[] indname_str;
         if (error) return error;
 	}
@@ -209,7 +209,7 @@ int SolverERM::solve()
     {
         string ext = ".lp";
         string model_path = mySolution->getOutputFilename(ext);
-        error = solverWriteModel(env, model, model_path.c_str()); // Exporting the model
+        error = solverWriteModel(model_path.c_str()); // Exporting the model
         if (error) return error;
     }
 
@@ -219,7 +219,7 @@ int SolverERM::solve()
 
     // Get the size of the model
     int numcols, numrows, cur_numlconstrs, cur_numgenconstrs;
-    error = solverGetModelDimensions(env, model, numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
+    error = solverGetModelDimensions(numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
     if (error) return error;
 
     std::cout << "Number of columns: " << numcols << std::endl;
@@ -230,7 +230,7 @@ int SolverERM::solve()
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
         std::cerr << "ERROR: There is something wrong with the model." << std::endl;
-        quit_solver(env, model);
+        quit_solver();
         return 1;
     }
 
@@ -259,7 +259,7 @@ int SolverERM::solve()
     // Create new solution structure
     mySolution->update(numcols, numrows, lpstat, stat_str, objval, 0, 0, 0.0, solution);
 
-    error = quit_solver(env, model);
+    error = quit_solver();
 
     return error;
 }
@@ -311,7 +311,7 @@ int SolverERM_l0::solve()
         namesZ[j] = new char[100];
 		sprintf(namesZ[j], "z_%d", j);
 	}
-    error = solverAddCols(env, model, sizeZ, costZ, NULL, NULL, xctypeZ, namesZ);
+    error = solverAddCols(sizeZ, costZ, NULL, NULL, xctypeZ, namesZ);
     if (error) return error;
 
     for (int j = 0; j < sizeZ; j++)
@@ -336,7 +336,7 @@ int SolverERM_l0::solve()
     {
         string ext = ".lp";
         string model_path = mySolution->getOutputFilename(ext);
-        error = solverWriteModel(env, model, model_path.c_str()); // Exporting the model
+        error = solverWriteModel(model_path.c_str()); // Exporting the model
         if (error) return error;
     }
 
@@ -346,7 +346,7 @@ int SolverERM_l0::solve()
 
     // Get the size of the model
     int numcols, numrows, cur_numlconstrs, cur_numgenconstrs;
-    error = solverGetModelDimensions(env, model, numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
+    error = solverGetModelDimensions(numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
     if (error) return error;
 
     std::cout << "Number of columns: " << numcols << std::endl;
@@ -357,7 +357,7 @@ int SolverERM_l0::solve()
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
         std::cerr << "ERROR: There is something wrong with the model." << std::endl;
-        quit_solver(env, model);
+        quit_solver();
         return 1;
     }
 
@@ -389,7 +389,7 @@ int SolverERM_l0::solve()
     // Create new solution structure
     this->mySolution->update(numcols, numrows, lpstat, stat_str, objval, bestobjval, nodecount, mipgap, solution);
 
-    error = quit_solver(env, model);
+    error = quit_solver();
     
     return error;
 }
@@ -438,7 +438,7 @@ int SolverERM_l1::solve()
             namesBeta_pos[j] = new char[100];
             sprintf(namesBeta_pos[j], "beta_pos_%d", j);
         }
-        error = solverAddCols(env, model, sizeBeta_pos, costBeta_pos, NULL, NULL, NULL, namesBeta_pos);
+        error = solverAddCols(sizeBeta_pos, costBeta_pos, NULL, NULL, NULL, namesBeta_pos);
         if (error) return error;
 
         for (int j = 0; j < sizeBeta_pos; j++)
@@ -457,7 +457,7 @@ int SolverERM_l1::solve()
             namesBeta_neg[j] = new char[100];
             sprintf(namesBeta_neg[j], "beta_neg_%d", j);
         }
-        error = solverAddCols(env, model, sizeBeta_neg, costBeta_neg, NULL, NULL, NULL, namesBeta_neg);
+        error = solverAddCols(sizeBeta_neg, costBeta_neg, NULL, NULL, NULL, namesBeta_neg);
         if (error) return error;
 
         for (int j = 0; j < sizeBeta_neg; j++)
@@ -497,7 +497,7 @@ int SolverERM_l1::solve()
             rowname[i] = new char[100];
             sprintf(rowname[i], "underage(%d)", i);
         }
-        error = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+        error = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
         if (error) return error;
 
         for (int i = 0; i < rcnt; i++)
@@ -535,7 +535,7 @@ int SolverERM_l1::solve()
             rowname[i] = new char[100];
             sprintf(rowname[i], "overage(%d)", i);
         }
-        error = solverAddRows(env, model, rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
+        error = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
         if (error) return error;
 
         for (int i = 0; i < rcnt; i++)
@@ -550,7 +550,7 @@ int SolverERM_l1::solve()
     {
         string ext = ".lp";
         string model_path = mySolution->getOutputFilename(ext);
-        error = solverWriteModel(env, model, model_path.c_str()); // Exporting the model
+        error = solverWriteModel(model_path.c_str()); // Exporting the model
         if (error) return error;
     }
 
@@ -560,7 +560,7 @@ int SolverERM_l1::solve()
 
     // Get the size of the model
     int numcols, numrows, cur_numlconstrs, cur_numgenconstrs;
-    error = solverGetModelDimensions(env, model, numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
+    error = solverGetModelDimensions(numcols, cur_numlconstrs, cur_numgenconstrs, numrows);
     if (error) return error;
 
     std::cout << "Number of columns: " << numcols << std::endl;
@@ -571,7 +571,7 @@ int SolverERM_l1::solve()
     if ((numcols != sizeVars) || (numrows != sizeConstrs))
     {
         std::cerr << "ERROR: There is something wrong with the model." << std::endl;
-        quit_solver(env, model);
+        quit_solver();
         return 1;
     }
 
@@ -603,7 +603,7 @@ int SolverERM_l1::solve()
     // Create new solution structure
     mySolution->update(numcols, numrows, lpstat, stat_str, objval, 0, 0, 0.0, solution);
 
-    error = quit_solver(env, model);
+    error = quit_solver();
 
     return error;
 }

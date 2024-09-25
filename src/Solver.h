@@ -33,8 +33,8 @@ protected:
 	// Parameters of the problem
 	std::shared_ptr<Solution> mySolution = NULL;
 
-	void *env = NULL;
-	void *model = NULL;
+	CPXENVptr env   = NULL;
+	CPXLPptr  model = NULL;
 
 	// Converts solver status to human-readable string
 	string getSolverStatusString(int modelstatus);
@@ -51,21 +51,21 @@ protected:
 	// Add indicator constraints related to the beta and z variables
 	virtual int addBetaIndConstrs(const int startBeta, const int startZ);
 
-	int solverAddCols(void *env, void *model, int ccnt, double *obj, double *lb, double *ub, char *vtype, char **colname);
-	int solverAddRows(void *env, void *model, int rcnt, int nzcnt, double *rhs, char *sense, int *rmatbeg, int *rmatind, double *rmatval, char **rowname);
-	int solverAddIndConstr(void *env, void *model, int indvar, int complemented, int nzcnt, double rhs, int sense, int *linind, double *linval, char *indname_str);
+	int solverAddCols(int ccnt, double *obj, double *lb, double *ub, char *vtype, char **colname);
+	int solverAddRows(int rcnt, int nzcnt, double *rhs, char *sense, int *rmatbeg, int *rmatind, double *rmatval, char **rowname);
+	int solverAddIndConstr(int indvar, int complemented, int nzcnt, double rhs, int sense, int *linind, double *linval, char *indname_str);
 
 	int initializeModel(int logToConsole, char const *modelname);
 
-	int solverWriteModel(void *env, void *model, char const *filename);
+	int solverWriteModel(char const *filename);
 
-	int solverGetModelDimensions(void *env, void *model, int& numcols, int& numlinconstrs, int& numindconstrs, int& numrows);
+	int solverGetModelDimensions(int& numcols, int& numlinconstrs, int& numindconstrs, int& numrows);
 
 	int solverOptimize(ModelType model_type);
 
 	int solverRetrieveSolution(int *modelstatus, double *objval, double *bestobjval, double *mipgap, double *nodecount, double *solution, int sizeVars);
 
-	int quit_solver(void *env, void *model);
+	int quit_solver();
 
 public:
     // Constructor common to all Solver solvers
