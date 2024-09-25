@@ -5,7 +5,7 @@
 // ERM model (without regularization)
 // ====================================================
 
-int SolverERM::addUnderageVariables(void *env, void *model, int& size)
+int SolverERM::addUnderageVariables(int& size)
 {
     // Create columns related to the u variables
     int sizeU = myData->nbSamples;
@@ -26,7 +26,7 @@ int SolverERM::addUnderageVariables(void *env, void *model, int& size)
     return status;
 }
 
-int SolverERM::addOverageVariables(void *env, void *model, int &size)
+int SolverERM::addOverageVariables(int &size)
 {
     // Create columns related to the o variables
     int sizeO = myData->nbSamples;
@@ -47,7 +47,7 @@ int SolverERM::addOverageVariables(void *env, void *model, int &size)
     return status;
 }
 
-int Solver::addBetaVariables(void *env, void *model, int& size)
+int Solver::addBetaVariables(int& size)
 {
     // Create columns related to the beta variables
     int sizeBeta = myData->nbFeatures;
@@ -69,7 +69,7 @@ int Solver::addBetaVariables(void *env, void *model, int& size)
     return status;
 }
 
-int Solver::addUnderageConstrs(void *env, void *model)
+int Solver::addUnderageConstrs()
 {
     // Add constraints related to underage costs
     int rcnt = myData->nbSamples; // An integer that indicates the number of new rows to be added to the constraint matrix.
@@ -105,7 +105,7 @@ int Solver::addUnderageConstrs(void *env, void *model)
     return error;
 }
 
-int Solver::addOverageConstrs(void *env, void *model)
+int Solver::addOverageConstrs()
 {
     // Add constraints related to overage costs
     int rcnt = myData->nbSamples; 
@@ -141,7 +141,7 @@ int Solver::addOverageConstrs(void *env, void *model)
     return error;
 }
 
-int Solver::addBetaIndConstrs(void *env, void *model, const int startBeta, const int startZ)
+int Solver::addBetaIndConstrs(const int startBeta, const int startZ)
 {
     // Add indicator constraints related to the beta and z variables
     int error = 0;
@@ -182,24 +182,24 @@ int SolverERM::solve()
 
     // Create columns related to the u variables
     int sizeU;
-    if (error = addUnderageVariables(env, model, sizeU)) return error;
+    if (error = addUnderageVariables(sizeU)) return error;
 
     // Create columns related to the o variables
     int sizeO;
-    if (error = addOverageVariables(env, model, sizeO)) return error;
+    if (error = addOverageVariables(sizeO)) return error;
 
     // Create columns related to the beta variables
     int sizeBeta;
-    if (error = addBetaVariables(env, model, sizeBeta)) return error;
+    if (error = addBetaVariables(sizeBeta)) return error;
 
     // Total number of variables
     int sizeVars = sizeU + sizeO + sizeBeta;
 
     // Add constraints related to underage costs
-    if (error = addUnderageConstrs(env, model)) return error;
+    if (error = addUnderageConstrs()) return error;
 
     // Add constraints related to overage costs
-    if (error = addOverageConstrs(env, model)) return error;
+    if (error = addOverageConstrs()) return error;
 
     // Total number of constraints
     int sizeConstrs = 2*myData->nbSamples;
@@ -214,7 +214,7 @@ int SolverERM::solve()
     }
 
     // Solve LP
-    error = solverOptimize(env, model, LP_PROBLEM); // Solving the model
+    error = solverOptimize(LP_PROBLEM); // Solving the model
     if (error) return error;
 
     // Get the size of the model
@@ -238,7 +238,7 @@ int SolverERM::solve()
     int lpstat;
     double objval;
     double solution[sizeVars];
-    error = solverRetrieveSolution(env, model, &lpstat, &objval, NULL, NULL, NULL, solution, sizeVars);
+    error = solverRetrieveSolution(&lpstat, &objval, NULL, NULL, NULL, solution, sizeVars);
     if (error) return error;
 
     // Convert status to string 
@@ -289,15 +289,15 @@ int SolverERM_l0::solve()
 
     // Create columns related to the u variables
     int sizeU;
-    if (error = addUnderageVariables(env, model, sizeU)) return error;
+    if (error = addUnderageVariables(sizeU)) return error;
 
     // Create columns related to the o variables
     int sizeO;
-    if (error = addOverageVariables(env, model, sizeO)) return error;
+    if (error = addOverageVariables(sizeO)) return error;
 
     // Create columns related to the beta variables
     int sizeBeta;
-    if (error = addBetaVariables(env, model, sizeBeta)) return error;
+    if (error = addBetaVariables(sizeBeta)) return error;
 
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
@@ -321,13 +321,13 @@ int SolverERM_l0::solve()
     int sizeVars = sizeU + sizeO + sizeBeta + sizeZ;
 
     // Add constraints related to underage costs
-    if (error = addUnderageConstrs(env, model)) return error;
+    if (error = addUnderageConstrs()) return error;
 
     // Add constraints related to overage costs
-    if (error = addOverageConstrs(env, model)) return error;
+    if (error = addOverageConstrs()) return error;
 
     // Add indicator constraints related to the beta variables
-    if (error = addBetaIndConstrs(env, model, sizeU+sizeO, sizeU+sizeO+sizeBeta)) return error;
+    if (error = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta)) return error;
 
     int sizeConstrs = 2*myData->nbSamples + myData->nbFeatures;
     
@@ -341,7 +341,7 @@ int SolverERM_l0::solve()
     }
 
     // Solve MILP
-    error = solverOptimize(env, model, MIP_PROBLEM); // Solving the model
+    error = solverOptimize(MIP_PROBLEM); // Solving the model
     if (error) return error;
 
     // Get the size of the model
@@ -365,7 +365,7 @@ int SolverERM_l0::solve()
     int lpstat;
     double objval, bestobjval, mipgap, nodecount;
     double solution[sizeVars];
-    error = solverRetrieveSolution(env, model, &lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
+    error = solverRetrieveSolution(&lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
     if (error) return error;
 
     // Convert status to string 
@@ -421,11 +421,11 @@ int SolverERM_l1::solve()
 
     // Create columns related to the u variables
     int sizeU;
-    if (error = addUnderageVariables(env, model, sizeU)) return error;
+    if (error = addUnderageVariables(sizeU)) return error;
 
     // Create columns related to the o variables
     int sizeO;
-    if (error = addOverageVariables(env, model, sizeO)) return error;
+    if (error = addOverageVariables(sizeO)) return error;
 
     // Create columns related to the beta+ variables
     const int sizeBeta_pos = myData->nbFeatures;
@@ -555,7 +555,7 @@ int SolverERM_l1::solve()
     }
 
     // Solve LP
-    error = solverOptimize(env, model, LP_PROBLEM); // Solving the model
+    error = solverOptimize(LP_PROBLEM); // Solving the model
     if (error) return error;
 
     // Get the size of the model
@@ -579,7 +579,7 @@ int SolverERM_l1::solve()
     int lpstat;
     double objval;
     double solution[sizeVars];
-    error = solverRetrieveSolution(env, model, &lpstat, &objval, NULL, NULL, NULL, solution, sizeVars);
+    error = solverRetrieveSolution(&lpstat, &objval, NULL, NULL, NULL, solution, sizeVars);
     if (error) return error;
 
     // Convert status to string 

@@ -40,16 +40,16 @@ protected:
 	string getSolverStatusString(int modelstatus);
 	
 	// Create columns related to the beta variables
-	virtual int addBetaVariables(void *env, void *model, int& size);
+	virtual int addBetaVariables(int& size);
 
 	// Add constraints related to underage costs
-	virtual int addUnderageConstrs(void *env, void *model);
+	virtual int addUnderageConstrs();
 
 	// Add constraints related to overage costs
-	virtual int addOverageConstrs(void *env, void *model);
+	virtual int addOverageConstrs();
 
 	// Add indicator constraints related to the beta and z variables
-	virtual int addBetaIndConstrs(void *env, void *model, const int startBeta, const int startZ);
+	virtual int addBetaIndConstrs(const int startBeta, const int startZ);
 
 	int solverAddCols(void *env, void *model, int ccnt, double *obj, double *lb, double *ub, char *vtype, char **colname);
 	int solverAddRows(void *env, void *model, int rcnt, int nzcnt, double *rhs, char *sense, int *rmatbeg, int *rmatind, double *rmatval, char **rowname);
@@ -61,9 +61,9 @@ protected:
 
 	int solverGetModelDimensions(void *env, void *model, int& numcols, int& numlinconstrs, int& numindconstrs, int& numrows);
 
-	int solverOptimize(void *env, void *model, ModelType model_type);
+	int solverOptimize(ModelType model_type);
 
-	int solverRetrieveSolution(void *env, void *model, int *modelstatus, double *objval, double *bestobjval, double *mipgap, double *nodecount, double *solution, int sizeVars);
+	int solverRetrieveSolution(int *modelstatus, double *objval, double *bestobjval, double *mipgap, double *nodecount, double *solution, int sizeVars);
 
 	int quit_solver(void *env, void *model);
 
@@ -87,28 +87,28 @@ public:
 	SolverBilevel(std::shared_ptr<Pb_Data> myData, std::shared_ptr<Solution> mySolution) : Solver(myData, mySolution) {}
 
 	// Create columns related to the u variables
-	int addUnderageVariables(void *env, void *model, int& size);
+	int addUnderageVariables(int& size);
 
 	// Create columns related to the o variables
-	int addOverageVariables(void *env, void *model, int& size);
+	int addOverageVariables(int& size);
 
 	// Create columns related to the mu variables
-	int addDualMuVariables(void *env, void *model, int& size);
+	int addDualMuVariables(int& size);
 
 	// Create columns related to the gamma variables
-	int addDualGammaVariables(void *env, void *model, int& size);
+	int addDualGammaVariables(int& size);
 
 	// Add constraint related to the lower-level problem's optimality condition
-	int addFollowerOptConstr(void *env, void *model);
+	int addFollowerOptConstr();
 
 	// Add constraints related to dual variable mu
-	int addDualMuConstrs(void *env, void *model);
+	int addDualMuConstrs();
 
 	// Add constraints related to dual variable gamma
-	int addDualGammaConstrs(void *env, void *model);
+	int addDualGammaConstrs();
 
 	// Add indicator constraints related to the dual variables mu and gamma
-	int addDualIndConstrs(void *env, void *model);
+	int addDualIndConstrs();
 
 	int solve() override;
 };
@@ -120,43 +120,43 @@ public:
 	SolverBilevelShuffleSplit(std::shared_ptr<Pb_Data> myData, std::shared_ptr<Solution> mySolution) : Solver(myData, mySolution) {}
 
 	// Create columns related to the u variables
-	int addUnderageVariables(void *env, void *model, int& size);
+	int addUnderageVariables(int& size);
 
 	// Create columns related to the o variables
-	int addOverageVariables(void *env, void *model, int& size);
+	int addOverageVariables(int& size);
 
 	// Create columns related to the beta variables
-	int addBetaVariables(void *env, void *model, int& size) override;
+	int addBetaVariables(int& size) override;
 
 	// Create columns related to the mu variables
-	int addDualMuVariables(void *env, void *model, int& size);
+	int addDualMuVariables(int& size);
 
 	// Create columns related to the gamma variables
-	int addDualGammaVariables(void *env, void *model, int& size);
+	int addDualGammaVariables(int& size);
 
 	// Create columns related to the z variables
-	int addZVariables(void *env, void *model, int& size);
+	int addZVariables(int& size);
 
 	// Add constraints related to underage costs
-	int addUnderageConstrs(void *env, void *model) override;
+	int addUnderageConstrs() override;
 
 	// Add constraints related to overage costs
-	int addOverageConstrs(void *env, void *model) override;
+	int addOverageConstrs() override;
 
 	// Add indicator constraints related to the beta and z variables
-	int addBetaIndConstrs(void *env, void *model, const int startBeta, const int startZ) override;
+	int addBetaIndConstrs(const int startBeta, const int startZ) override;
 
 	// Add constraint related to the lower-level problem's optimality condition
-	int addFollowerOptConstr(void *env, void *model);
+	int addFollowerOptConstr();
 
 	// Add constraints related to dual variable mu
-	int addDualMuConstrs(void *env, void *model, const int startMu);
+	int addDualMuConstrs(const int startMu);
 
 	// Add constraints related to dual variable gamma
-	int addDualGammaConstrs(void *env, void *model, const int startGamma);
+	int addDualGammaConstrs(const int startGamma);
 
 	// Add indicator constraints related to the dual variables mu and gamma
-	int addDualIndConstrs(void *env, void *model);
+	int addDualIndConstrs();
 
 	int solve() override;
 };
@@ -168,10 +168,10 @@ public:
 	SolverERM(std::shared_ptr<Pb_Data> myData, std::shared_ptr<Solution> mySolution) : Solver(myData, mySolution) {}
 
 	// Create columns related to the u variables
-	int addUnderageVariables(void *env, void *model, int& size);
+	int addUnderageVariables(int& size);
 
 	// Create columns related to the o variables
-	int addOverageVariables(void *env, void *model, int& size);
+	int addOverageVariables(int& size);
 
 	virtual int solve() override;
 };
@@ -202,10 +202,10 @@ public:
 	int spIndex = -1;
 
 	// Create columns related to the u variables
-	int addUnderageVariables(void *env, void *model, int& size);
+	int addUnderageVariables(int& size);
 
 	// Create columns related to the o variables
-	int addOverageVariables(void *env, void *model, int& size);
+	int addOverageVariables(int& size);
 
 	static std::unique_ptr<SolverSubProblem> createSolverSP(std::shared_ptr<Pb_Data> myData, std::shared_ptr<Solution> mySolution);
 
@@ -217,9 +217,9 @@ class SolverSubProblem_ERM_l0 : public SolverSubProblem
 public:
 	SolverSubProblem_ERM_l0(std::shared_ptr<Pb_Data> myData, std::shared_ptr<Solution> mySolution) : SolverSubProblem(myData, mySolution) {}
 
-	int addUnderageConstrs(void *env, void *model) override;
+	int addUnderageConstrs() override;
 
-	int addOverageConstrs(void *env, void *model) override;
+	int addOverageConstrs() override;
 
 	int solve() override;
 };
@@ -229,9 +229,9 @@ class SolverSubProblem_ERM_l1 : public SolverSubProblem
 public:
 	SolverSubProblem_ERM_l1(std::shared_ptr<Pb_Data> myData, std::shared_ptr<Solution> mySolution) : SolverSubProblem(myData, mySolution) {}
 
-	int addUnderageConstrs(void *env, void *model) override;
+	int addUnderageConstrs() override;
 
-	int addOverageConstrs(void *env, void *model) override;
+	int addOverageConstrs() override;
 
 	int solve() override;
 };

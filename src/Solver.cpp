@@ -217,7 +217,7 @@ int Solver::solverGetModelDimensions(void *env, void *model, int& numcols, int& 
     return status;
 }
 
-int Solver::solverOptimize(void *env, void *model, ModelType model_type)
+int Solver::solverOptimize(ModelType model_type)
 {
     int status = 0;
 
@@ -235,7 +235,7 @@ int Solver::solverOptimize(void *env, void *model, ModelType model_type)
     return status;
 }
 
-int Solver::solverRetrieveSolution(void *env, void *model, int *modelstatus, double *objval, double *bestobjval, double *mipgap, double *nodecount, double *solution, int sizeVars)
+int Solver::solverRetrieveSolution(int *modelstatus, double *objval, double *bestobjval, double *mipgap, double *nodecount, double *solution, int sizeVars)
 {
     int status = 0;
 
@@ -272,7 +272,7 @@ int Solver::solverRetrieveSolution(void *env, void *model, int *modelstatus, dou
 }
 
 
-int SolverBilevel::addUnderageVariables(void *env, void *model, int& size)
+int SolverBilevel::addUnderageVariables(int& size)
 {
     // Create columns related to the u variables
     int sizeU = myData->nbSamples;
@@ -296,7 +296,7 @@ int SolverBilevel::addUnderageVariables(void *env, void *model, int& size)
     return status;
 }
 
-int SolverBilevel::addOverageVariables(void *env, void *model, int& size)
+int SolverBilevel::addOverageVariables(int& size)
 {
     // Create columns related to the o variables
     int sizeO = myData->nbSamples;
@@ -321,7 +321,7 @@ int SolverBilevel::addOverageVariables(void *env, void *model, int& size)
     return status;
 }
 
-int SolverBilevel::addDualMuVariables(void *env, void *model, int& size)
+int SolverBilevel::addDualMuVariables(int& size)
 {
     // Create columns related to the mu variables
     int sizeMu = myData->nbTrainSamples;
@@ -345,7 +345,7 @@ int SolverBilevel::addDualMuVariables(void *env, void *model, int& size)
     return status;
 }
 
-int SolverBilevel::addDualGammaVariables(void *env, void *model, int& size)
+int SolverBilevel::addDualGammaVariables(int& size)
 {
     // Create columns related to the gamma variables
     int sizeGamma = myData->nbTrainSamples;
@@ -371,7 +371,7 @@ int SolverBilevel::addDualGammaVariables(void *env, void *model, int& size)
     return status;
 }
 
-int SolverBilevel::addFollowerOptConstr(void *env, void *model)
+int SolverBilevel::addFollowerOptConstr()
 {
     int nzcnt = myData->nbTrainSamples*4; 
     double rhs = 0;
@@ -406,7 +406,7 @@ int SolverBilevel::addFollowerOptConstr(void *env, void *model)
     return status;
 }
 
-int SolverBilevel::addDualMuConstrs(void *env, void *model)
+int SolverBilevel::addDualMuConstrs()
 {
     // Add constraints related to dual variable mu
     int rcnt = myData->nbTrainSamples; 
@@ -436,7 +436,7 @@ int SolverBilevel::addDualMuConstrs(void *env, void *model)
     return status;
 }
 
-int SolverBilevel::addDualGammaConstrs(void *env, void *model)
+int SolverBilevel::addDualGammaConstrs()
 {
     int rcnt = myData->nbTrainSamples; 
     int nzcnt = rcnt; 
@@ -465,7 +465,7 @@ int SolverBilevel::addDualGammaConstrs(void *env, void *model)
     return status;
 }
 
-int SolverBilevel::addDualIndConstrs(void *env, void *model)
+int SolverBilevel::addDualIndConstrs()
 {
     int status = 0;
     int nzcnt = 2*myData->nbTrainSamples;
@@ -512,19 +512,19 @@ int SolverBilevel::solve()
     int sizeU, sizeO, sizeBeta, sizeMu, sizeGamma;
 
     // Create columns related to the u variables
-    if (status = addUnderageVariables(env, model, sizeU)) return status;
+    if (status = addUnderageVariables(sizeU)) return status;
 
     // Create columns related to the o variables
-    if (status = addOverageVariables(env, model, sizeO)) return status;
+    if (status = addOverageVariables(sizeO)) return status;
 
     // Create columns related to the beta variables
-    if (status = addBetaVariables(env, model, sizeBeta)) return status;
+    if (status = addBetaVariables(sizeBeta)) return status;
 
     // Create columns related to the mu variables
-    if (status = addDualMuVariables(env, model, sizeMu)) return status;
+    if (status = addDualMuVariables(sizeMu)) return status;
 
     // Create columns related to the gamma variables
-    if (status = addDualGammaVariables(env, model, sizeGamma)) return status;
+    if (status = addDualGammaVariables(sizeGamma)) return status;
 
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
@@ -559,25 +559,25 @@ int SolverBilevel::solve()
     // Add constraints to the model
 
     // Add constraints related to underage costs
-    if (status = addUnderageConstrs(env, model)) return status;
+    if (status = addUnderageConstrs()) return status;
 
     // Add constraints related to overage costs
-    if (status = addOverageConstrs(env, model)) return status;
+    if (status = addOverageConstrs()) return status;
 
     // Add indicator constraints related to the beta variables
-    if (status = addBetaIndConstrs(env, model, sizeU+sizeO, sizeU+sizeO+sizeBeta+sizeMu+sizeGamma)) return status;
+    if (status = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta+sizeMu+sizeGamma)) return status;
 
     // Add constraint related to the lower-level problem's optimality condition
-    if (status = addFollowerOptConstr(env, model)) return status;
+    if (status = addFollowerOptConstr()) return status;
 
     // Add constraints related to dual variable mu
-    if (status = addDualMuConstrs(env, model)) return status;
+    if (status = addDualMuConstrs()) return status;
 
     // Add constraints related to dual variable gamma
-    if (status = addDualGammaConstrs(env, model)) return status;
+    if (status = addDualGammaConstrs()) return status;
 
     // Add indicator constraints related to the dual variables mu and gamma
-    if (status = addDualIndConstrs(env, model)) return status;
+    if (status = addDualIndConstrs()) return status;
 
     int sizeConstrs = 2*myData->nbSamples + 2*myData->nbTrainSamples + 2*myData->nbFeatures + 1;
 
@@ -595,7 +595,7 @@ int SolverBilevel::solve()
     }
 
     // Solve MIP
-    status = solverOptimize(env, model, MIP_PROBLEM); // Solving the model
+    status = solverOptimize(MIP_PROBLEM); // Solving the model
     if (status) return status;
 
     // Get the size of the model
@@ -619,7 +619,7 @@ int SolverBilevel::solve()
     int lpstat;
     double objval, bestobjval, mipgap, nodecount;
     double solution[sizeVars];
-    status = solverRetrieveSolution(env, model, &lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
+    status = solverRetrieveSolution(&lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
     if (status) return status;
 
     // Convert CPLEX status to string 
@@ -645,7 +645,7 @@ int SolverBilevel::solve()
 
 // ***************************************************************************************** // 
 
-int SolverBilevelShuffleSplit::addUnderageVariables(void *env, void *model, int& size)
+int SolverBilevelShuffleSplit::addUnderageVariables(int& size)
 {
     // Create columns related to the u variables
     int sizeU = myData->splitSize * myData->nbFolds;
@@ -681,7 +681,7 @@ int SolverBilevelShuffleSplit::addUnderageVariables(void *env, void *model, int&
     return status;
 }
 	
-int SolverBilevelShuffleSplit::addOverageVariables(void *env, void *model, int& size)
+int SolverBilevelShuffleSplit::addOverageVariables(int& size)
 {
     // Create columns related to the o variables
     int sizeO = myData->splitSize * myData->nbFolds;
@@ -717,7 +717,7 @@ int SolverBilevelShuffleSplit::addOverageVariables(void *env, void *model, int& 
     return status;
 }
 
-int SolverBilevelShuffleSplit::addBetaVariables(void *env, void *model, int& size)
+int SolverBilevelShuffleSplit::addBetaVariables(int& size)
 {
     // Create columns related to the beta variables
     int sizeBeta = myData->nbFeatures * myData->nbFolds;
@@ -749,7 +749,7 @@ int SolverBilevelShuffleSplit::addBetaVariables(void *env, void *model, int& siz
     return status;
 }
 
-int SolverBilevelShuffleSplit::addDualMuVariables(void *env, void *model, int& size)
+int SolverBilevelShuffleSplit::addDualMuVariables(int& size)
 {
     // Create columns related to the mu variables
     int sizeMu = myData->nbFolds * myData->splitTrainSize;
@@ -778,7 +778,7 @@ int SolverBilevelShuffleSplit::addDualMuVariables(void *env, void *model, int& s
     return status;
 }
 
-int SolverBilevelShuffleSplit::addDualGammaVariables(void *env, void *model, int& size)
+int SolverBilevelShuffleSplit::addDualGammaVariables(int& size)
 {
     // Create columns related to the gamma variables
     int sizeGamma = myData->nbFolds * myData->splitTrainSize;
@@ -811,7 +811,7 @@ int SolverBilevelShuffleSplit::addDualGammaVariables(void *env, void *model, int
     return status;
 }
 
-int SolverBilevelShuffleSplit::addZVariables(void *env, void *model, int& size)
+int SolverBilevelShuffleSplit::addZVariables(int& size)
 {
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
@@ -839,7 +839,7 @@ int SolverBilevelShuffleSplit::addZVariables(void *env, void *model, int& size)
     return status;
 }
 
-int SolverBilevelShuffleSplit::addUnderageConstrs(void *env, void *model)
+int SolverBilevelShuffleSplit::addUnderageConstrs()
 {
     // Add constraints related to underage costs
     int rcnt = myData->splitSize * myData->nbFolds; // An integer that indicates the number of new rows to be added to the constraint matrix.
@@ -883,7 +883,7 @@ int SolverBilevelShuffleSplit::addUnderageConstrs(void *env, void *model)
     return status;
 }
 
-int SolverBilevelShuffleSplit::addOverageConstrs(void *env, void *model)
+int SolverBilevelShuffleSplit::addOverageConstrs()
 {
     // Add constraints related to overage costs
     int rcnt = myData->splitSize * myData->nbFolds; // An integer that indicates the number of new rows to be added to the constraint matrix.
@@ -927,7 +927,7 @@ int SolverBilevelShuffleSplit::addOverageConstrs(void *env, void *model)
     return status;
 }
 
-int SolverBilevelShuffleSplit::addBetaIndConstrs(void *env, void *model, const int startBeta, const int startZ)
+int SolverBilevelShuffleSplit::addBetaIndConstrs(const int startBeta, const int startZ)
 {
     // Add indicator constraints related to the beta and z variables
     int status = 0;
@@ -954,7 +954,7 @@ int SolverBilevelShuffleSplit::addBetaIndConstrs(void *env, void *model, const i
     return status;
 }
 
-int SolverBilevelShuffleSplit::addFollowerOptConstr(void *env, void *model)
+int SolverBilevelShuffleSplit::addFollowerOptConstr()
 {
     // Add constraint related to the lower-level problem's optimality condition    
     int rcnt = myData->nbFolds; // An integer that indicates the number of new rows to be added to the constraint matrix.
@@ -1019,7 +1019,7 @@ int SolverBilevelShuffleSplit::addFollowerOptConstr(void *env, void *model)
 }
 
 
-int SolverBilevelShuffleSplit::addDualMuConstrs(void *env, void *model, const int startMu)
+int SolverBilevelShuffleSplit::addDualMuConstrs(const int startMu)
 {
     // Add constraints related to dual variable mu
     int rcnt, nzcnt;
@@ -1057,7 +1057,7 @@ int SolverBilevelShuffleSplit::addDualMuConstrs(void *env, void *model, const in
     return status;
 }
 
-int SolverBilevelShuffleSplit::addDualGammaConstrs(void *env, void *model, const int startGamma)
+int SolverBilevelShuffleSplit::addDualGammaConstrs(const int startGamma)
 {
     // Add constraints related to dual variable gamma
     int rcnt, nzcnt;
@@ -1095,7 +1095,7 @@ int SolverBilevelShuffleSplit::addDualGammaConstrs(void *env, void *model, const
     return status;
 }
 
-int SolverBilevelShuffleSplit::addDualIndConstrs(void *env, void *model)
+int SolverBilevelShuffleSplit::addDualIndConstrs()
 {
     // Add indicator constraints related to the dual variables mu and gamma
     int status = 0;
@@ -1157,22 +1157,22 @@ int SolverBilevelShuffleSplit::solve()
     int sizeU, sizeO, sizeBeta, sizeMu, sizeGamma, sizeZ;
 
     // Create columns related to the u variables
-    if (status = addUnderageVariables(env, model, sizeU)) return status;
+    if (status = addUnderageVariables(sizeU)) return status;
 
     // Create columns related to the o variables
-    if (status = addOverageVariables(env, model, sizeO)) return status;
+    if (status = addOverageVariables(sizeO)) return status;
 
     // Create columns related to the beta variables
-    if (status = addBetaVariables(env, model, sizeBeta)) return status;
+    if (status = addBetaVariables(sizeBeta)) return status;
 
     // Create columns related to the mu variables
-    if (status = addDualMuVariables(env, model, sizeMu)) return status;
+    if (status = addDualMuVariables(sizeMu)) return status;
 
     // Create columns related to the gamma variables
-    if (status = addDualGammaVariables(env, model, sizeGamma)) return status;
+    if (status = addDualGammaVariables(sizeGamma)) return status;
 
     // Create columns related to the z variables
-    if (status = addZVariables(env, model, sizeZ)) return status;
+    if (status = addZVariables(sizeZ)) return status;
 
     int sizeVars = sizeU + sizeO + sizeBeta + sizeMu + sizeGamma + sizeZ;
 
@@ -1183,25 +1183,25 @@ int SolverBilevelShuffleSplit::solve()
     // Add constraints to the model
     
     // Add constraints related to underage costs
-    if (status = addUnderageConstrs(env, model)) return status;
+    if (status = addUnderageConstrs()) return status;
 
     // Add constraints related to overage costs
-    if (status = addOverageConstrs(env, model)) return status;
+    if (status = addOverageConstrs()) return status;
 
     // Add indicator constraints related to the beta and z variables
-    if (status = addBetaIndConstrs(env, model, sizeU+sizeO, sizeU+sizeO+sizeBeta+sizeMu+sizeGamma)) return status;
+    if (status = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta+sizeMu+sizeGamma)) return status;
 
     // Add constraint related to the lower-level problem's optimality condition
-    if (status = addFollowerOptConstr(env, model)) return status;
+    if (status = addFollowerOptConstr()) return status;
 
     // Add constraints related to dual variable mu
-    if (status = addDualMuConstrs(env, model, sizeU+sizeO+sizeBeta)) return status;
+    if (status = addDualMuConstrs(sizeU+sizeO+sizeBeta)) return status;
 
     // Add constraints related to dual variable gamma
-    if (status = addDualGammaConstrs(env, model, sizeU+sizeO+sizeBeta+sizeMu)) return status;
+    if (status = addDualGammaConstrs(sizeU+sizeO+sizeBeta+sizeMu)) return status;
 
     // Add indicator constraints related to the dual variables mu and gamma
-    if (status = addDualIndConstrs(env, model)) return status;
+    if (status = addDualIndConstrs()) return status;
 
     int sizeConstrs = 2*myData->splitSize*myData->nbFolds + myData->nbFolds + 2*myData->splitTrainSize*myData->nbFolds + 2*myData->nbFeatures*myData->nbFolds;
 
@@ -1219,7 +1219,7 @@ int SolverBilevelShuffleSplit::solve()
     }
 
     // Solve MIP
-    status = solverOptimize(env, model, MIP_PROBLEM); // Solving the model
+    status = solverOptimize(MIP_PROBLEM); // Solving the model
     if (status) return status;
     
     // Get the size of the model
@@ -1243,7 +1243,7 @@ int SolverBilevelShuffleSplit::solve()
     int lpstat;
     double objval, bestobjval, mipgap, nodecount;
     double solution[sizeVars];
-    status = solverRetrieveSolution(env, model, &lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
+    status = solverRetrieveSolution(&lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
     if (status) return status;
 
     // Convert status to string 
