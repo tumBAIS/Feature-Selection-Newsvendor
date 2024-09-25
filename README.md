@@ -12,7 +12,7 @@ This repository provides all components required to reproduce the results from t
 ## Requirements
 
 The solver is implemented in the programming language C++ and requires CPLEX (version 20.1) to solve the mixed intereger linear programming formulations. 
-The code requires Python (version 3) for generating the instances. Compilation uses make and requires g++ to be installed.
+The code requires Python (version 3.10) for generating the instances. Compilation uses make and requires g++ to be installed.
 
 ## Installation
 
