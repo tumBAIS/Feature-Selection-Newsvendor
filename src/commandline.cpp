@@ -43,7 +43,7 @@ commandline::commandline(int argc, char *argv[])
 	//Default parameter values
 	this->problemType = BL;
 	this->nbThreads = 1;
-	this->timeLimit = -1; // use CPLEX default
+	this->timeLimit = 10800; // default: 3 hours
 	this->train_val_split = 0.7;
 	this->split_size = -1; // use all data points in the splits
 	this->regularization_param = 0;

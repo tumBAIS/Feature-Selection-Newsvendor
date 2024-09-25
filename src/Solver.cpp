@@ -161,8 +161,7 @@ int Solver::initializeModel(int logToConsole, char const *modelname)
     CPXsetintparam((CPXENVptr) this->env, CPXPARAM_ScreenOutput, logToConsole); // Switching ON the display
     CPXsetintparam((CPXENVptr) this->env, CPXPARAM_Read_DataCheck, CPX_DATACHECK_WARN); // Print warnings
     CPXsetintparam((CPXENVptr) this->env, CPX_PARAM_THREADS, myData->nbThreads);		  // number of threads
-    if (myData->timeLimit > 0)
-        CPXsetdblparam((CPXENVptr) this->env, CPX_PARAM_TILIM, myData->timeLimit); // sets time limit for the solver.
+    CPXsetdblparam((CPXENVptr) this->env, CPX_PARAM_TILIM, myData->timeLimit); // sets time limit for the solver.
 
     this->model = CPXcreateprob((CPXENVptr) this->env, &status, modelname); // Create LP problem as a container
     return status;
