@@ -181,13 +181,13 @@ int SolverSubProblem_ERM_l0::solve()
     int sizeU, sizeO, sizeBeta;
 
     // Create columns related to the u variables
-    if (error = addUnderageVariables(sizeU)) return error;
+    if ((error = addUnderageVariables(sizeU))) return error;
     
     // Create columns related to the o variables
-    if (error = addOverageVariables(sizeO)) return error;
+    if ((error = addOverageVariables(sizeO))) return error;
 
     // Create columns related to the beta variables
-    if (error = addBetaVariables(sizeBeta)) return error;
+    if ((error = addBetaVariables(sizeBeta))) return error;
 
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
@@ -221,13 +221,13 @@ int SolverSubProblem_ERM_l0::solve()
     // Add constraints to the model
 
     // Add constraints related to underage costs
-    if (error = addUnderageConstrs()) return error;
+    if ((error = addUnderageConstrs())) return error;
 
     // Add constraints related to overage costs
-    if (error = addOverageConstrs()) return error;
+    if ((error = addOverageConstrs())) return error;
     
     // Add indicator constraints related to the beta variables
-    if (error = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta)) return error;
+    if ((error = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta))) return error;
 
     int sizeConstrs = 2*myData->nbTrainSamples + myData->nbFeatures;
 
@@ -451,10 +451,10 @@ int SolverSubProblem_ERM_l1::solve()
     int sizeU, sizeO;
 
     // Create columns related to the u variables
-    if (error = addUnderageVariables(sizeU)) return error;
+    if ((error = addUnderageVariables(sizeU))) return error;
     
     // Create columns related to the o variables
-    if (error = addOverageVariables(sizeO)) return error;
+    if ((error = addOverageVariables(sizeO))) return error;
 
     // Create columns related to the beta+ variables
     {
@@ -512,10 +512,10 @@ int SolverSubProblem_ERM_l1::solve()
     // Add constraints to the model
 
     // Add constraints related to underage costs
-    if (error = addUnderageConstrs()) return error;
+    if ((error = addUnderageConstrs())) return error;
 
     // Add constraints related to overage costs
-    if (error = addOverageConstrs()) return error;
+    if ((error = addOverageConstrs())) return error;
 
     int sizeConstrs = 2*myData->nbTrainSamples;
 

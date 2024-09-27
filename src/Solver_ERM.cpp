@@ -199,24 +199,24 @@ int SolverERM::solve()
 
     // Create columns related to the u variables
     int sizeU;
-    if (error = addUnderageVariables(sizeU)) return error;
+    if ((error = addUnderageVariables(sizeU))) return error;
 
     // Create columns related to the o variables
     int sizeO;
-    if (error = addOverageVariables(sizeO)) return error;
+    if ((error = addOverageVariables(sizeO))) return error;
 
     // Create columns related to the beta variables
     int sizeBeta;
-    if (error = addBetaVariables(sizeBeta)) return error;
+    if ((error = addBetaVariables(sizeBeta))) return error;
 
     // Total number of variables
     int sizeVars = sizeU + sizeO + sizeBeta;
 
     // Add constraints related to underage costs
-    if (error = addUnderageConstrs()) return error;
+    if ((error = addUnderageConstrs())) return error;
 
     // Add constraints related to overage costs
-    if (error = addOverageConstrs()) return error;
+    if ((error = addOverageConstrs())) return error;
 
     // Total number of constraints
     int sizeConstrs = 2*myData->nbSamples;
@@ -310,15 +310,15 @@ int SolverERM_l0::solve()
 
     // Create columns related to the u variables
     int sizeU;
-    if (error = addUnderageVariables(sizeU)) return error;
+    if ((error = addUnderageVariables(sizeU))) return error;
 
     // Create columns related to the o variables
     int sizeO;
-    if (error = addOverageVariables(sizeO)) return error;
+    if ((error = addOverageVariables(sizeO))) return error;
 
     // Create columns related to the beta variables
     int sizeBeta;
-    if (error = addBetaVariables(sizeBeta)) return error;
+    if ((error = addBetaVariables(sizeBeta))) return error;
 
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
@@ -344,13 +344,13 @@ int SolverERM_l0::solve()
     int sizeVars = sizeU + sizeO + sizeBeta + sizeZ;
 
     // Add constraints related to underage costs
-    if (error = addUnderageConstrs()) return error;
+    if ((error = addUnderageConstrs())) return error;
 
     // Add constraints related to overage costs
-    if (error = addOverageConstrs()) return error;
+    if ((error = addOverageConstrs())) return error;
 
     // Add indicator constraints related to the beta variables
-    if (error = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta)) return error;
+    if ((error = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta))) return error;
 
     int sizeConstrs = 2*myData->nbSamples + myData->nbFeatures;
     
@@ -448,11 +448,11 @@ int SolverERM_l1::solve()
 
     // Create columns related to the u variables
     int sizeU;
-    if (error = addUnderageVariables(sizeU)) return error;
+    if ((error = addUnderageVariables(sizeU))) return error;
 
     // Create columns related to the o variables
     int sizeO;
-    if (error = addOverageVariables(sizeO)) return error;
+    if ((error = addOverageVariables(sizeO))) return error;
 
     // Create columns related to the beta+ variables
     const int sizeBeta_pos = myData->nbFeatures;

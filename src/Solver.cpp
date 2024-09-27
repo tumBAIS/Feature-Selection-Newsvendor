@@ -526,19 +526,19 @@ int SolverBilevel::solve()
     int sizeU, sizeO, sizeBeta, sizeMu, sizeGamma;
 
     // Create columns related to the u variables
-    if (status = addUnderageVariables(sizeU)) return status;
+    if ((status = addUnderageVariables(sizeU))) return status;
 
     // Create columns related to the o variables
-    if (status = addOverageVariables(sizeO)) return status;
+    if ((status = addOverageVariables(sizeO))) return status;
 
     // Create columns related to the beta variables
-    if (status = addBetaVariables(sizeBeta)) return status;
+    if ((status = addBetaVariables(sizeBeta))) return status;
 
     // Create columns related to the mu variables
-    if (status = addDualMuVariables(sizeMu)) return status;
+    if ((status = addDualMuVariables(sizeMu))) return status;
 
     // Create columns related to the gamma variables
-    if (status = addDualGammaVariables(sizeGamma)) return status;
+    if ((status = addDualGammaVariables(sizeGamma))) return status;
 
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
@@ -577,25 +577,25 @@ int SolverBilevel::solve()
     // Add constraints to the model
 
     // Add constraints related to underage costs
-    if (status = addUnderageConstrs()) return status;
+    if ((status = addUnderageConstrs())) return status;
 
     // Add constraints related to overage costs
-    if (status = addOverageConstrs()) return status;
+    if ((status = addOverageConstrs())) return status;
 
     // Add indicator constraints related to the beta variables
-    if (status = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta+sizeMu+sizeGamma)) return status;
+    if ((status = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta+sizeMu+sizeGamma))) return status;
 
     // Add constraint related to the lower-level problem's optimality condition
-    if (status = addFollowerOptConstr()) return status;
+    if ((status = addFollowerOptConstr())) return status;
 
     // Add constraints related to dual variable mu
-    if (status = addDualMuConstrs()) return status;
+    if ((status = addDualMuConstrs())) return status;
 
     // Add constraints related to dual variable gamma
-    if (status = addDualGammaConstrs()) return status;
+    if ((status = addDualGammaConstrs())) return status;
 
     // Add indicator constraints related to the dual variables mu and gamma
-    if (status = addDualIndConstrs()) return status;
+    if ((status = addDualIndConstrs())) return status;
 
     int sizeConstrs = 2*myData->nbSamples + 2*myData->nbTrainSamples + 2*myData->nbFeatures + 1;
 
@@ -1222,22 +1222,22 @@ int SolverBilevelShuffleSplit::solve()
     int sizeU, sizeO, sizeBeta, sizeMu, sizeGamma, sizeZ;
 
     // Create columns related to the u variables
-    if (status = addUnderageVariables(sizeU)) return status;
+    if ((status = addUnderageVariables(sizeU))) return status;
 
     // Create columns related to the o variables
-    if (status = addOverageVariables(sizeO)) return status;
+    if ((status = addOverageVariables(sizeO))) return status;
 
     // Create columns related to the beta variables
-    if (status = addBetaVariables(sizeBeta)) return status;
+    if ((status = addBetaVariables(sizeBeta))) return status;
 
     // Create columns related to the mu variables
-    if (status = addDualMuVariables(sizeMu)) return status;
+    if ((status = addDualMuVariables(sizeMu))) return status;
 
     // Create columns related to the gamma variables
-    if (status = addDualGammaVariables(sizeGamma)) return status;
+    if ((status = addDualGammaVariables(sizeGamma))) return status;
 
     // Create columns related to the z variables
-    if (status = addZVariables(sizeZ)) return status;
+    if ((status = addZVariables(sizeZ))) return status;
 
     int sizeVars = sizeU + sizeO + sizeBeta + sizeMu + sizeGamma + sizeZ;
 
@@ -1248,25 +1248,25 @@ int SolverBilevelShuffleSplit::solve()
     // Add constraints to the model
     
     // Add constraints related to underage costs
-    if (status = addUnderageConstrs()) return status;
+    if ((status = addUnderageConstrs())) return status;
 
     // Add constraints related to overage costs
-    if (status = addOverageConstrs()) return status;
+    if ((status = addOverageConstrs())) return status;
 
     // Add indicator constraints related to the beta and z variables
-    if (status = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta+sizeMu+sizeGamma)) return status;
+    if ((status = addBetaIndConstrs(sizeU+sizeO, sizeU+sizeO+sizeBeta+sizeMu+sizeGamma))) return status;
 
     // Add constraint related to the lower-level problem's optimality condition
-    if (status = addFollowerOptConstr()) return status;
+    if ((status = addFollowerOptConstr())) return status;
 
     // Add constraints related to dual variable mu
-    if (status = addDualMuConstrs(sizeU+sizeO+sizeBeta)) return status;
+    if ((status = addDualMuConstrs(sizeU+sizeO+sizeBeta))) return status;
 
     // Add constraints related to dual variable gamma
-    if (status = addDualGammaConstrs(sizeU+sizeO+sizeBeta+sizeMu)) return status;
+    if ((status = addDualGammaConstrs(sizeU+sizeO+sizeBeta+sizeMu))) return status;
 
     // Add indicator constraints related to the dual variables mu and gamma
-    if (status = addDualIndConstrs()) return status;
+    if ((status = addDualIndConstrs())) return status;
 
     int sizeConstrs = 2*myData->splitSize*myData->nbFolds + myData->nbFolds + 2*myData->splitTrainSize*myData->nbFolds + 2*myData->nbFeatures*myData->nbFolds;
 
