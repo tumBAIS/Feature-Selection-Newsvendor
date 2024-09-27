@@ -267,7 +267,7 @@ int SolverBilevel::addUnderageVariables(int& size)
 {
     // Create columns related to the u variables
     int sizeU = myData->nbSamples;
-	double costU[sizeU];
+	double *costU = new double[sizeU];
 	char **namesU = new char *[sizeU];
 	for (int i = 0; i < myData->nbSamples; i++)
 	{
@@ -279,6 +279,8 @@ int SolverBilevel::addUnderageVariables(int& size)
 		sprintf(namesU[i], "u_%d", i);
 	}
     int status = solverAddCols(sizeU, costU, NULL, NULL, NULL, namesU);
+    
+    delete[] costU;
     for (int i = 0; i < sizeU; i++)
 		delete[] namesU[i];
     delete[] namesU;
@@ -291,7 +293,7 @@ int SolverBilevel::addOverageVariables(int& size)
 {
     // Create columns related to the o variables
     int sizeO = myData->nbSamples;
-    double costO[sizeO];
+    double *costO = new double[sizeO];
 	char **namesO = new char *[sizeO];
 	for (int i = 0; i < myData->nbSamples; i++)
 	{
@@ -304,6 +306,7 @@ int SolverBilevel::addOverageVariables(int& size)
 	}
     int status = solverAddCols(sizeO, costO, NULL, NULL, NULL, namesO);
 
+    delete[] costO;
     for (int i = 0; i < sizeO; i++)
 		delete[] namesO[i];
     delete[] namesO;
@@ -316,21 +319,23 @@ int SolverBilevel::addDualMuVariables(int& size)
 {
     // Create columns related to the mu variables
     int sizeMu = myData->nbTrainSamples;
-	char **namesMu = new char *[sizeMu];
-    double lbMu[sizeMu];
-	double ubMu[sizeMu];
-	for (int i = 0; i < myData->nbTrainSamples; i++)
-	{
+    char **namesMu = new char *[sizeMu];
+    double *lbMu = new double[sizeMu];
+    double *ubMu = new double[sizeMu];
+    for (int i = 0; i < myData->nbTrainSamples; i++)
+    {
         lbMu[i] = -CPX_INFBOUND;
-		ubMu[i] = 0.0;
+        ubMu[i] = 0.0;
         namesMu[i] = new char[100];
-		sprintf(namesMu[i], "mu_%d", i);
-	}
+        sprintf(namesMu[i], "mu_%d", i);
+    }
     int status = solverAddCols(sizeMu, NULL, lbMu, ubMu, NULL, namesMu);
 
     for (int i = 0; i < sizeMu; i++)
-		delete[] namesMu[i];
+        delete[] namesMu[i];
     delete[] namesMu;
+    delete[] lbMu;
+    delete[] ubMu;
 
     size = sizeMu; // return number of variables added to the model
     return status;
@@ -480,8 +485,8 @@ int SolverBilevel::addDualIndConstrs()
     char *indname_str;
     for (int j=0; j<myData->nbFeatures; j++)
 	{
-        int linind[nzcnt];
-        double linval[nzcnt];
+        int *linind = new int[nzcnt];
+        double *linval = new double[nzcnt];
         for (int i=0; i<myData->nbTrainSamples; i++)
         {
             linind[i] = 2*myData->nbSamples + myData->nbFeatures + i; // mu
@@ -496,6 +501,8 @@ int SolverBilevel::addDualIndConstrs()
         status = solverAddIndConstr(indvar, false, nzcnt, 0, 'E', linind, linval, indname_str);
         if (status) return status;
         delete[] indname_str;
+        delete[] linind;
+        delete[] linval;
 	}
     return status;
 }
@@ -629,9 +636,12 @@ int SolverBilevel::solve()
     // Retrieve solution
     int lpstat;
     double objval, bestobjval, mipgap, nodecount;
-    double solution[sizeVars];
+    double *solution = new double[sizeVars];
     status = solverRetrieveSolution(&lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
-    if (status) return status;
+    if (status) {
+        delete[] solution;
+        return status;
+    }
 
     // Convert CPLEX status to string 
     string stat_str = getSolverStatusString(lpstat);
@@ -648,6 +658,7 @@ int SolverBilevel::solve()
 
     // Create new solution structure
     this->mySolution->update(numcols, numrows, lpstat, stat_str, objval, bestobjval, nodecount, mipgap, solution);
+    delete[] solution;
 
     status = quit_solver();
 
@@ -660,7 +671,7 @@ int SolverBilevelShuffleSplit::addUnderageVariables(int& size)
 {
     // Create columns related to the u variables
     int sizeU = myData->splitSize * myData->nbFolds;
-	double costU[sizeU];
+	double *costU = new double[sizeU];
 	char **namesU = new char *[sizeU];
 
     int r = 0;
@@ -684,6 +695,7 @@ int SolverBilevelShuffleSplit::addUnderageVariables(int& size)
     }
 	int status = solverAddCols(sizeU, costU, NULL, NULL, NULL, namesU);
     
+    delete[] costU;
     for (int r = 0; r < sizeU; r++)
 		delete[] namesU[r];
     delete[] namesU;
@@ -696,7 +708,7 @@ int SolverBilevelShuffleSplit::addOverageVariables(int& size)
 {
     // Create columns related to the o variables
     int sizeO = myData->splitSize * myData->nbFolds;
-    double costO[sizeO];
+    double *costO = new double[sizeO];
 	char **namesO = new char *[sizeO];
 
     int r = 0;
@@ -720,6 +732,7 @@ int SolverBilevelShuffleSplit::addOverageVariables(int& size)
     }
 	int status = solverAddCols(sizeO, costO, NULL, NULL, NULL, namesO);
 
+    delete[] costO;
     for (int r = 0; r < sizeO; r++)
 		delete[] namesO[r];
     delete[] namesO;
@@ -732,8 +745,8 @@ int SolverBilevelShuffleSplit::addBetaVariables(int& size)
 {
     // Create columns related to the beta variables
     int sizeBeta = myData->nbFeatures * myData->nbFolds;
-    double lbBeta[sizeBeta];
-    double ubBeta[sizeBeta];
+    double *lbBeta = new double[sizeBeta];
+    double *ubBeta = new double[sizeBeta];
 	char **namesBeta = new char *[sizeBeta];
     int r = 0;
     for (int k = 0; k < myData->nbFolds; k++) {
@@ -752,6 +765,8 @@ int SolverBilevelShuffleSplit::addBetaVariables(int& size)
     }
 	int status = solverAddCols(sizeBeta, NULL, lbBeta, ubBeta, NULL, namesBeta);
 
+    delete[] lbBeta;
+    delete[] ubBeta;
     for (int r = 0; r < sizeBeta; r++)
 		delete[] namesBeta[r];
     delete[] namesBeta;
@@ -764,9 +779,9 @@ int SolverBilevelShuffleSplit::addDualMuVariables(int& size)
 {
     // Create columns related to the mu variables
     int sizeMu = myData->nbFolds * myData->splitTrainSize;
-	char **namesMu = new char *[sizeMu];
-    double lbMu[sizeMu];
-	double ubMu[sizeMu];
+    char **namesMu = new char *[sizeMu];
+    double *lbMu = new double[sizeMu];
+    double *ubMu = new double[sizeMu];
     int r = 0;
     for (int k = 0; k < myData->nbFolds; k++) {
         for (int i = 0; i < myData->nbSamples; i++) {
@@ -784,6 +799,8 @@ int SolverBilevelShuffleSplit::addDualMuVariables(int& size)
     for (int r = 0; r < sizeMu; r++)
 		delete[] namesMu[r];
     delete[] namesMu;
+    delete[] lbMu;
+    delete[] ubMu;
 
     size = sizeMu;
     return status;
@@ -794,8 +811,8 @@ int SolverBilevelShuffleSplit::addDualGammaVariables(int& size)
     // Create columns related to the gamma variables
     int sizeGamma = myData->nbFolds * myData->splitTrainSize;
     char **namesGamma = new char *[sizeGamma];
-    double lbGamma[sizeGamma];
-	double ubGamma[sizeGamma];
+    double *lbGamma = new double[sizeGamma];
+	double *ubGamma = new double[sizeGamma];
 
     int r = 0;
     for (int k = 0; k < myData->nbFolds; k++)
@@ -817,6 +834,8 @@ int SolverBilevelShuffleSplit::addDualGammaVariables(int& size)
     for (int r = 0; r < sizeGamma; r++)
 		delete[] namesGamma[r];
     delete[] namesGamma;
+    delete[] lbGamma;
+    delete[] ubGamma;
 
     size = sizeGamma;
     return status;
@@ -826,9 +845,9 @@ int SolverBilevelShuffleSplit::addZVariables(int& size)
 {
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
-    char xctypeZ[sizeZ];
+    char *xctypeZ = new char[sizeZ];
     char **namesZ = new char *[sizeZ];
-    double lbZ[sizeZ];
+    double *lbZ = new double[sizeZ];
 	for (int j = 0; j < myData->nbFeatures; j++)
 	{
         if (j == 0) {
@@ -842,9 +861,11 @@ int SolverBilevelShuffleSplit::addZVariables(int& size)
 	}
 	int status = solverAddCols(sizeZ, NULL, lbZ, NULL, xctypeZ, namesZ);
     
+    delete[] xctypeZ;
     for (int j = 0; j < sizeZ; j++)
 		delete[] namesZ[j];
     delete[] namesZ;
+    delete[] lbZ;
 
     size = sizeZ;
     return status;
@@ -1149,8 +1170,8 @@ int SolverBilevelShuffleSplit::addDualIndConstrs()
         for (int k=0; k<myData->nbFolds; k++)
         {   
             nzcnt = 2*myData->splitTrainSize;
-            int linind[nzcnt];
-            double linval[nzcnt];
+            int *linind = new int[nzcnt];
+            double *linval = new double[nzcnt];
             int r = 0;
             for (int i=0; i<myData->nbSamples; i++)
             {
@@ -1175,6 +1196,8 @@ int SolverBilevelShuffleSplit::addDualIndConstrs()
                 if (status) return status;
             }
             delete[] indname_str;
+            delete[] linind;
+            delete[] linval;
         }
     }
     return status;
@@ -1284,9 +1307,12 @@ int SolverBilevelShuffleSplit::solve()
     // Retrieve solution
     int lpstat;
     double objval, bestobjval, mipgap, nodecount;
-    double solution[sizeVars];
+    double *solution = new double[sizeVars];
     status = solverRetrieveSolution(&lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
-    if (status) return status;
+    if (status) {
+        delete[] solution;
+        return status;
+    }
 
     // Convert status to string 
     string stat_str = getSolverStatusString(lpstat);
@@ -1316,6 +1342,7 @@ int SolverBilevelShuffleSplit::solve()
 
     // Create new solution structure
     this->mySolution->update(numcols, numrows, lpstat, stat_str, objval, bestobjval, nodecount, mipgap, solution);
+    delete[] solution;
 
     status = quit_solver();
 

@@ -254,9 +254,12 @@ int SolverERM::solve()
     // Retrieve solution
     int lpstat;
     double objval;
-    double solution[sizeVars];
+    double *solution = new double[sizeVars];
     error = solverRetrieveSolution(&lpstat, &objval, NULL, NULL, NULL, solution, sizeVars);
-    if (error) return error;
+    if (error) {
+        delete[] solution;
+        return error;
+    }
 
     // Convert status to string 
     string stat_str = getSolverStatusString(lpstat);
@@ -275,6 +278,7 @@ int SolverERM::solve()
 
     // Create new solution structure
     mySolution->update(numcols, numrows, lpstat, stat_str, objval, 0, 0, 0.0, solution);
+    delete[] solution;
 
     error = quit_solver();
 
@@ -383,9 +387,12 @@ int SolverERM_l0::solve()
     // Retrieve solution
     int lpstat;
     double objval, bestobjval, mipgap, nodecount;
-    double solution[sizeVars];
+    double *solution = new double[sizeVars];
     error = solverRetrieveSolution(&lpstat, &objval, &bestobjval, &mipgap, &nodecount, solution, sizeVars);
-    if (error) return error;
+    if (error) {
+        delete[] solution;
+        return error;
+    }
 
     // Convert status to string 
     string stat_str = getSolverStatusString(lpstat);
@@ -407,6 +414,7 @@ int SolverERM_l0::solve()
     
     // Create new solution structure
     this->mySolution->update(numcols, numrows, lpstat, stat_str, objval, bestobjval, nodecount, mipgap, solution);
+    delete[] solution;
 
     error = quit_solver();
     
@@ -611,9 +619,12 @@ int SolverERM_l1::solve()
     // Retrieve solution
     int lpstat;
     double objval;
-    double solution[sizeVars];
+    double *solution = new double[sizeVars];
     error = solverRetrieveSolution(&lpstat, &objval, NULL, NULL, NULL, solution, sizeVars);
-    if (error) return error;
+    if (error) {
+        delete[] solution;
+        return error;
+    }
 
     // Convert status to string 
     string stat_str = getSolverStatusString(lpstat);
@@ -635,6 +646,7 @@ int SolverERM_l1::solve()
 
     // Create new solution structure
     mySolution->update(numcols, numrows, lpstat, stat_str, objval, 0, 0, 0.0, solution);
+    delete[] solution;
 
     error = quit_solver();
 
