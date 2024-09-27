@@ -108,11 +108,12 @@ string Solution::doubleToString(double inputVal)
     stream << std::fixed << std::setprecision(2) << inputVal;
     string auxString = stream.str();
 
-    if (auxString.back() == '0')
+    if (auxString.back() == '0') {
         auxString = auxString.substr(0, auxString.length()-1);
 
         if (auxString.back() == '0')
             auxString = auxString.substr(0, auxString.length()-2);
+    }
 
     string resultString;
     std::remove_copy(auxString.begin(), auxString.end(), std::back_inserter(resultString), '.');
