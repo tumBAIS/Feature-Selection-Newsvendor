@@ -3,7 +3,6 @@
 #include <cstring>
 #include <vector>
 #include <stdlib.h>
-#include <bits/stdc++.h> 
 #include <sys/stat.h> 
 #include <sys/types.h> 
 #include <chrono>
