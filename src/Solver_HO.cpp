@@ -4,7 +4,7 @@ int SolverSubProblem::addUnderageVariables(int& size)
 {
     // Create columns related to the u variables
     int sizeU = myData->nbTrainSamples;
-	double costU[sizeU];
+	double *costU = new double[sizeU];
 	char **namesU = new char *[sizeU];
     int r = 0;
 	for (int i = 0; i < myData->nbSamples; i++)
@@ -18,6 +18,7 @@ int SolverSubProblem::addUnderageVariables(int& size)
 	}
     int status = solverAddCols(sizeU, costU, NULL, NULL, NULL, namesU);
     
+    delete[] costU;
     for (int r = 0; r < sizeU; r++)
 		delete[] namesU[r];
     delete[] namesU;
@@ -32,7 +33,7 @@ int SolverSubProblem::addOverageVariables(int& size)
 {
     // Create columns related to the o variables
     int sizeO = myData->nbTrainSamples;
-    double costO[sizeO];
+    double *costO = new double[sizeO];
 	char **namesO = new char *[sizeO];
     int r = 0;
 	for (int i = 0; i < myData->nbSamples; i++)
@@ -46,6 +47,7 @@ int SolverSubProblem::addOverageVariables(int& size)
 	}
     int status = solverAddCols(sizeO, costO, NULL, NULL, NULL, namesO);
     
+    delete[] costO;
     for (int r = 0; r < sizeO; r++)
 		delete[] namesO[r];
     delete[] namesO;
@@ -177,7 +179,7 @@ int SolverSubProblem_ERM_l0::solve()
 
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
-    double costZ[myData->nbFeatures];
+    double *costZ = new double[myData->nbFeatures];
     char vtypeZ[sizeZ];
     char **namesZ = new char *[sizeZ];
 	for (int j = 0; j < myData->nbFeatures; j++)
@@ -192,6 +194,8 @@ int SolverSubProblem_ERM_l0::solve()
 		sprintf(namesZ[j], "z_%d", j);
 	}
     error = solverAddCols(sizeZ, costZ, NULL, NULL, vtypeZ, namesZ);
+    
+    delete[] costZ;
     for (int j = 0; j < sizeZ; j++)
 		delete[] namesZ[j];
     delete[] namesZ;

@@ -9,7 +9,7 @@ int SolverERM::addUnderageVariables(int& size)
 {
     // Create columns related to the u variables
     int sizeU = myData->nbSamples;
-	double costU[sizeU];
+	double *costU = new double[sizeU];
 	char **namesU = new char *[sizeU];
 	for (int i = 0; i < sizeU; i++)
 	{
@@ -18,6 +18,8 @@ int SolverERM::addUnderageVariables(int& size)
 		sprintf(namesU[i], "u_%d", i);
 	}
     int status = solverAddCols(sizeU, costU, NULL, NULL, NULL, namesU);
+
+    delete[] costU;
     for (int i = 0; i < sizeU; i++)
 		delete[] namesU[i];
     delete[] namesU;
@@ -30,7 +32,7 @@ int SolverERM::addOverageVariables(int &size)
 {
     // Create columns related to the o variables
     int sizeO = myData->nbSamples;
-    double costO[sizeO];
+    double *costO = new double[sizeO];
 	char **namesO = new char *[sizeO];
 	for (int i = 0; i < sizeO; i++)
 	{
@@ -39,6 +41,8 @@ int SolverERM::addOverageVariables(int &size)
 		sprintf(namesO[i], "o_%d", i);
 	}
     int status = solverAddCols(sizeO, costO, NULL, NULL, NULL, namesO);
+    
+    delete[] costO;
     for (int i = 0; i < sizeO; i++)
 		delete[] namesO[i];
     delete[] namesO;
@@ -51,7 +55,7 @@ int Solver::addBetaVariables(int& size)
 {
     // Create columns related to the beta variables
     int sizeBeta = myData->nbFeatures;
-	double lbBeta[sizeBeta];
+	double *lbBeta = new double[sizeBeta];
     char **namesBeta = new char *[sizeBeta];
 	for (int j = 0; j < myData->nbFeatures; j++)
 	{
@@ -61,6 +65,7 @@ int Solver::addBetaVariables(int& size)
 	}
     int status = solverAddCols(sizeBeta, NULL, lbBeta, NULL, NULL, namesBeta);
 
+    delete[] lbBeta;
     for (int j = 0; j < sizeBeta; j++)
 		delete[] namesBeta[j];
     delete[] namesBeta;
