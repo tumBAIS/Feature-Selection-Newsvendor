@@ -341,8 +341,8 @@ int SolverBilevel::addDualGammaVariables(int& size)
     // Create columns related to the gamma variables
     int sizeGamma = myData->nbTrainSamples;
     char **namesGamma = new char *[sizeGamma];
-    double lbGamma[sizeGamma];
-	double ubGamma[sizeGamma];
+    double *lbGamma = new double[sizeGamma];
+    double *ubGamma = new double[sizeGamma];
 	for (int i = 0; i < myData->nbTrainSamples; i++)
 	{
         lbGamma[i] = -CPX_INFBOUND;
@@ -355,6 +355,8 @@ int SolverBilevel::addDualGammaVariables(int& size)
     for (int i = 0; i < sizeGamma; i++)
 		delete[] namesGamma[i];
     delete[] namesGamma;
+    delete[] lbGamma;
+    delete[] ubGamma;
 
     if (status) return status;
 
@@ -368,8 +370,8 @@ int SolverBilevel::addFollowerOptConstr()
     double rhs = 0;
     char sense = 'L';
     int beg = 0;
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
     char *rowname = new char[100];
     sprintf(rowname, "follower_opt");
     for (int i=0; i<myData->nbTrainSamples; i++) 
@@ -392,6 +394,8 @@ int SolverBilevel::addFollowerOptConstr()
     }
     int status = solverAddRows(1, nzcnt, &rhs, &sense, &beg, rmatind, rmatval, &rowname);
 
+    delete[] rmatind;
+    delete[] rmatval;
     delete[] rowname;
 
     return status;
@@ -402,11 +406,11 @@ int SolverBilevel::addDualMuConstrs()
     // Add constraints related to dual variable mu
     int rcnt = myData->nbTrainSamples; 
     int nzcnt = rcnt; 
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
     for (int i=0; i<myData->nbTrainSamples; i++) 
     {
@@ -420,6 +424,12 @@ int SolverBilevel::addDualMuConstrs()
     }
     int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
     delete[] rowname;
@@ -431,11 +441,11 @@ int SolverBilevel::addDualGammaConstrs()
 {
     int rcnt = myData->nbTrainSamples; 
     int nzcnt = rcnt; 
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
     for (int i=0; i<myData->nbTrainSamples; i++) 
     {
@@ -449,6 +459,12 @@ int SolverBilevel::addDualGammaConstrs()
     }
     int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
     delete[] rowname;
@@ -519,9 +535,9 @@ int SolverBilevel::solve()
 
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
-    double lbZ[sizeZ];
-    double ubZ[sizeZ];
-    char xctypeZ[sizeZ];
+    double *lbZ = new double[sizeZ];
+    double *ubZ = new double[sizeZ];
+    char *xctypeZ = new char[sizeZ];
     char **namesZ = new char *[sizeZ];
 	for (int j = 0; j < myData->nbFeatures; j++)
 	{
@@ -536,6 +552,10 @@ int SolverBilevel::solve()
 		sprintf(namesZ[j], "z_%d", j);
 	}
     status = solverAddCols(sizeZ, NULL, lbZ, ubZ, xctypeZ, namesZ);
+    
+    delete[] lbZ;
+    delete[] ubZ;
+    delete[] xctypeZ;
     for (int j = 0; j < sizeZ; j++)
 		delete[] namesZ[j];
     delete[] namesZ;
@@ -836,11 +856,11 @@ int SolverBilevelShuffleSplit::addUnderageConstrs()
     int rcnt = myData->splitSize * myData->nbFolds; // An integer that indicates the number of new rows to be added to the constraint matrix.
     int ncolsperrow = myData->nbFeatures + 1;
     int nzcnt = rcnt * ncolsperrow; // An integer that indicates the number of nonzero constraint coefficients to be added to the constraint matrix. This specifies the length of the arrays rmatind and rmatval.
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
     int r = 0;
     for (int k=0; k<myData->nbFolds; k++)
@@ -867,6 +887,12 @@ int SolverBilevelShuffleSplit::addUnderageConstrs()
     }
     int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int r = 0; r < rcnt; r++)
 		delete[] rowname[r];
     delete[] rowname;
@@ -880,11 +906,11 @@ int SolverBilevelShuffleSplit::addOverageConstrs()
     int rcnt = myData->splitSize * myData->nbFolds; // An integer that indicates the number of new rows to be added to the constraint matrix.
     int ncolsperrow = myData->nbFeatures + 1;
     int nzcnt = rcnt * ncolsperrow; // An integer that indicates the number of nonzero constraint coefficients to be added to the constraint matrix. This specifies the length of the arrays rmatind and rmatval.
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
     int r = 0;
     for (int k=0; k<myData->nbFolds; k++)
@@ -911,6 +937,12 @@ int SolverBilevelShuffleSplit::addOverageConstrs()
     }
     int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int r = 0; r < rcnt; r++)
 		delete[] rowname[r];
     delete[] rowname;
@@ -950,11 +982,11 @@ int SolverBilevelShuffleSplit::addFollowerOptConstr()
     // Add constraint related to the lower-level problem's optimality condition    
     int rcnt = myData->nbFolds; // An integer that indicates the number of new rows to be added to the constraint matrix.
     int nzcnt = rcnt * (myData->splitTrainSize * 4);
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
 
     int p_idx = 0; // primal index
@@ -1002,6 +1034,12 @@ int SolverBilevelShuffleSplit::addFollowerOptConstr()
     }
     int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int r = 0; r < rcnt; r++)
 		delete[] rowname[r];
     delete[] rowname;
@@ -1015,11 +1053,12 @@ int SolverBilevelShuffleSplit::addDualMuConstrs(const int startMu)
     // Add constraints related to dual variable mu
     int rcnt, nzcnt;
     rcnt = nzcnt = myData->nbFolds * myData->splitTrainSize; 
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
     int r = 0;
     for (int k=0; k<myData->nbFolds; k++)
@@ -1041,6 +1080,12 @@ int SolverBilevelShuffleSplit::addDualMuConstrs(const int startMu)
     }
     int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
     delete[] rowname;
@@ -1053,11 +1098,11 @@ int SolverBilevelShuffleSplit::addDualGammaConstrs(const int startGamma)
     // Add constraints related to dual variable gamma
     int rcnt, nzcnt;
     rcnt = nzcnt = myData->nbFolds * myData->splitTrainSize;
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
     int r = 0;
     for (int k=0; k<myData->nbFolds; k++)
@@ -1079,6 +1124,12 @@ int SolverBilevelShuffleSplit::addDualGammaConstrs(const int startGamma)
     }
     int status = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
     delete[] rowname;

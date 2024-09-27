@@ -80,11 +80,11 @@ int Solver::addUnderageConstrs()
     int rcnt = myData->nbSamples; // An integer that indicates the number of new rows to be added to the constraint matrix.
     int ncolsperrow = (myData->nbFeatures + 1);
     int nzcnt = rcnt * ncolsperrow; // An integer that indicates the number of nonzero constraint coefficients to be added to the constraint matrix. This specifies the length of the arrays rmatind and rmatval.
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
     for (int i=0; i<myData->nbSamples; i++) 
     {
@@ -103,6 +103,12 @@ int Solver::addUnderageConstrs()
     }
     int error = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
     delete[] rowname;
@@ -116,11 +122,11 @@ int Solver::addOverageConstrs()
     int rcnt = myData->nbSamples; 
     int ncolsperrow = (myData->nbFeatures + 1);
     int nzcnt = rcnt * ncolsperrow; 
-    int rmatbeg[rcnt];
-    int rmatind[nzcnt];
-    double rmatval[nzcnt];
-    double rhs[rcnt];
-    char sense[rcnt];
+    int *rmatbeg = new int[rcnt];
+    int *rmatind = new int[nzcnt];
+    double *rmatval = new double[nzcnt];
+    double *rhs = new double[rcnt];
+    char *sense = new char[rcnt];
     char **rowname = new char *[rcnt];
     for (int i=0; i<myData->nbSamples; i++) 
     {
@@ -139,6 +145,12 @@ int Solver::addOverageConstrs()
     }
     int error = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
 
+    // Free memory
+    delete[] rmatbeg;
+    delete[] rmatind;
+    delete[] rmatval;
+    delete[] rhs;
+    delete[] sense;
     for (int i = 0; i < rcnt; i++)
 		delete[] rowname[i];
     delete[] rowname;
@@ -306,8 +318,8 @@ int SolverERM_l0::solve()
 
     // Create columns related to the z variables
     int sizeZ = myData->nbFeatures;
-    double costZ[sizeZ];
-    char xctypeZ[sizeZ];
+    double *costZ = new double[sizeZ];
+    char *xctypeZ = new char[sizeZ];
     char **namesZ = new char *[sizeZ];
 	for (int j = 0; j < myData->nbFeatures; j++)
 	{
@@ -319,6 +331,8 @@ int SolverERM_l0::solve()
     error = solverAddCols(sizeZ, costZ, NULL, NULL, xctypeZ, namesZ);
     if (error) return error;
 
+    delete[] costZ;
+    delete[] xctypeZ;
     for (int j = 0; j < sizeZ; j++)
 		delete[] namesZ[j];
     delete[] namesZ;
@@ -435,7 +449,7 @@ int SolverERM_l1::solve()
     // Create columns related to the beta+ variables
     const int sizeBeta_pos = myData->nbFeatures;
     {
-        double costBeta_pos[myData->nbFeatures];
+        double *costBeta_pos = new double[myData->nbFeatures];
         char **namesBeta_pos = new char *[myData->nbFeatures];
         for (int j = 0; j < myData->nbFeatures; j++)
         {
@@ -446,6 +460,7 @@ int SolverERM_l1::solve()
         error = solverAddCols(sizeBeta_pos, costBeta_pos, NULL, NULL, NULL, namesBeta_pos);
         if (error) return error;
 
+        delete[] costBeta_pos;
         for (int j = 0; j < sizeBeta_pos; j++)
             delete[] namesBeta_pos[j];
         delete[] namesBeta_pos;
@@ -454,7 +469,7 @@ int SolverERM_l1::solve()
     // Create columns related to the beta- variables
     const int sizeBeta_neg = myData->nbFeatures;
     {
-        double costBeta_neg[myData->nbFeatures];
+        double *costBeta_neg = new double[myData->nbFeatures];
         char **namesBeta_neg = new char *[myData->nbFeatures];
         for (int j = 0; j < myData->nbFeatures; j++)
         {
@@ -465,6 +480,7 @@ int SolverERM_l1::solve()
         error = solverAddCols(sizeBeta_neg, costBeta_neg, NULL, NULL, NULL, namesBeta_neg);
         if (error) return error;
 
+        delete[] costBeta_neg;
         for (int j = 0; j < sizeBeta_neg; j++)
             delete[] namesBeta_neg[j];
         delete[] namesBeta_neg;
@@ -477,11 +493,11 @@ int SolverERM_l1::solve()
         const int rcnt = myData->nbSamples; // An integer that indicates the number of new rows to be added to the constraint matrix.
         const int ncolsperrow = (myData->nbFeatures*2 + 1);
         const int nzcnt = rcnt * ncolsperrow; // An integer that indicates the number of nonzero constraint coefficients to be added to the constraint matrix. This specifies the length of the arrays rmatind and rmatval.
-        int rmatbeg[rcnt];
-        int rmatind[nzcnt];
-        double rmatval[nzcnt];
-        double rhs[rcnt];
-        char sense[rcnt];
+        int *rmatbeg = new int[rcnt];
+        int *rmatind = new int[nzcnt];
+        double *rmatval = new double[nzcnt];
+        double *rhs = new double[rcnt];
+        char *sense = new char[rcnt];
         char **rowname = new char *[rcnt];
         for (int i=0; i<myData->nbSamples; i++) 
         {
@@ -505,6 +521,12 @@ int SolverERM_l1::solve()
         error = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
         if (error) return error;
 
+        // Free memory
+        delete[] rmatbeg;
+        delete[] rmatind;
+        delete[] rmatval;
+        delete[] rhs;
+        delete[] sense;
         for (int i = 0; i < rcnt; i++)
             delete[] rowname[i];
         delete[] rowname;
@@ -515,11 +537,11 @@ int SolverERM_l1::solve()
         const int rcnt = myData->nbSamples; 
         const int ncolsperrow = (myData->nbFeatures*2 + 1);
         const int nzcnt = rcnt * ncolsperrow; 
-        int rmatbeg[rcnt];
-        int rmatind[nzcnt];
-        double rmatval[nzcnt];
-        double rhs[rcnt];
-        char sense[rcnt];
+        int *rmatbeg = new int[rcnt];
+        int *rmatind = new int[nzcnt];
+        double *rmatval = new double[nzcnt];
+        double *rhs = new double[rcnt];
+        char *sense = new char[rcnt];
         char **rowname = new char *[rcnt];
         for (int i=0; i<myData->nbSamples; i++) 
         {
@@ -543,6 +565,12 @@ int SolverERM_l1::solve()
         error = solverAddRows(rcnt, nzcnt, rhs, sense, rmatbeg, rmatind, rmatval, rowname);
         if (error) return error;
 
+        // Free memory
+        delete[] rmatbeg;
+        delete[] rmatind;
+        delete[] rmatval;
+        delete[] rhs;
+        delete[] sense;
         for (int i = 0; i < rcnt; i++)
             delete[] rowname[i];
         delete[] rowname;
