@@ -12,12 +12,15 @@ This repository provides all components required to reproduce the results from t
 ## Requirements
 
 The solver is implemented in the programming language C++ and requires CPLEX (version 20.1) to solve the mixed intereger linear programming formulations. 
-The code requires Python (version 3.10) for generating the instances. Compilation uses make and requires g++ to be installed.
+The code requires Python (version 3.10) for generating the instances. The software was developed and tested on Linux. Compilation uses make and requires g++ to be installed. 
+
+Compilation in Windows is also possible and requires CMake to be installed.
 
 ## Installation
 
-A Makefile is provided for compiling the code, which assumes that CPLEX is installed in the directory `/opt/ibm/`. To compile the code, change to `src` directory and run `make`. 
+- **Linux**: The file `src/Makefile` is provided for compiling the code, which assumes that CPLEX is installed in the directory `/opt/ibm/`. To compile the code, change to `src` directory and run `make`. 
 
+- **Windows**: The files `CMakeLists.txt` and `FindCPLEX.cmake` are provided for compiling the code with CMake. 
 
 ## Generation of instances
 
